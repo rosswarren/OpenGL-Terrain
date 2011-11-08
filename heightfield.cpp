@@ -11,20 +11,16 @@ static GLuint textureNumber;
 static GLuint lavaNumber;
 
 bool HeightField::Create(char *hFileName, char *tFileName, const int hWidth, const int hHeight) {	
-	waterheight = 480.0f;
+	waterheight = -250.0f;
 	hmHeight = hHeight;
 	hmWidth = hWidth;
 	
 	FILE *fp;
-
 	fp = fopen(hFileName, "rb");
-
 	fread(hHeightField, 1, hWidth * hHeight, fp);
-
 	fclose(fp);
 
 	FILE *terrain;
-
 	terrain = fopen(hFileName, "rb");
 	fread(texture, 1, hWidth * hHeight, terrain);
 	fclose(terrain);
@@ -46,7 +42,6 @@ bool HeightField::Create(char *hFileName, char *tFileName, const int hWidth, con
 
 				vhVertices[nIndex].x = flX;
 				vhVertices[nIndex].y = hHeightField[(int)flX][(int)flZ];
-				//printf("%f", vhVertices[nIndex].y);
 				vhVertices[nIndex].z = flZ;
 				vhTexCoords[nIndex].u = flX / 1024;
 				vhTexCoords[nIndex].v = flZ / 1024;
@@ -65,28 +60,9 @@ bool HeightField::Create(char *hFileName, char *tFileName, const int hWidth, con
 	lavaNumber = LoadTextureRAW("lava.raw", 0);
 
 	return true;
-}/*
-	hmHeight = hHeight;
-	hmWidth = hWidth;
-	
-	FILE *fp;
+}
 
-	fp = fopen(hFileName, "rb");
-
-	fread(hHeightField, 1, hWidth * hHeight, fp);
-
-	fclose(fp);
-
-	//FILE *terrain;
-
-	//terrain = fopen(tFileName, "rb");
-
-	//fread(texture, 1, hWidth * hHeight, fp);
-
-	return true; 
-}*/
-
-// load a 256x256 RGB .RAW file as a texture
+// load a 1024x1024 RGB .RAW file as a texture
 GLuint HeightField::LoadTextureRAW( const char * filename, int wrap ) {
     GLuint texture;
     int width, height;
@@ -160,36 +136,16 @@ void HeightField::Init() {
 
 	return;
 
-	/*
-	glNewList(list, GL_COMPILE);
-	//glPushMatrix();
 
-	 DOTS 
+	/* DOTS 
 	glBegin(GL_POINTS);
 		for (int hMapX = 0; hMapX < hmWidth; hMapX++) {
 			for (int hMapZ = 0; hMapZ < hmHeight; hMapZ++) {
 				glVertex3f((GLfloat)hMapX, hHeightField[hMapX][hMapZ], (GLfloat)hMapZ);	
 			}
 		}
-	glEnd();   
+	glEnd();   */
 
-	 Triangle Strips 
-	for (int hMapX = 0; hMapX < hmWidth; hMapX++) {
-		for (int hMapZ = 0; hMapZ < hmHeight; hMapZ++) {
-			GLfloat x = (GLfloat)hMapX;
-			GLfloat z = (GLfloat)hMapZ;
-			
-			glBegin(GL_TRIANGLE_STRIP);
-				glVertex3f(x, hHeightField[hMapX][hMapZ], z);
-				glVertex3f(x, hHeightField[hMapX][hMapZ + 1], z + 1);
-				glVertex3f(x + 1, hHeightField[hMapX + 1][hMapZ], z);
-				glVertex3f(x + 1, hHeightField[hMapX + 1][hMapZ + 1], z + 1);
-			glEnd();
-		}
-	}
-
-	//glPopMatrix();
-	glEndList();  */
 }
 
 void HeightField::Cube() {
@@ -235,7 +191,7 @@ void HeightField::Render() {
 	glEnable(GL_TEXTURE_2D); // enable drawing the texture
 	glBindTexture(GL_TEXTURE_2D, lavaNumber); // bind the texture
 	glPushMatrix();
-	glTranslatef(512.0f, waterheight, 512.0f);
+	glTranslatef(512.0f, -250.0f, 512.0f);
 	glScalef(512.0f, 400.0f, 512.0f);
 	glNormal3f(0, 1, 0);
 	Cube();
@@ -244,7 +200,7 @@ void HeightField::Render() {
 	glDisable(GL_TEXTURE_2D);
 
     glPushMatrix();
-	glTranslatef(512.0f, waterheight, 512.0f);
+	glTranslatef(740.0f, 210.0f, 250.0f);
 	glScalef(20.0f, 60.0f, 20.0f);
 	glutSolidCube(1.0f);
 	glPopMatrix();
@@ -267,7 +223,7 @@ void HeightField::Render() {
 	//glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBONormals);
 	//glNormalPointer(GL_FLOAT, 0, (char *) NULL);
 
-	glNormal3f(0, 1, 0);
+	glNormal3f(0, 1.0f, 0);
 
 	glDrawArrays(GL_TRIANGLES, 0, vhVertexCount);
 
