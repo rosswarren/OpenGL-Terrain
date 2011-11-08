@@ -60,7 +60,7 @@ bool HeightField::Create(char *hFileName, char *tFileName, const int hWidth, con
 
 	Init();
 
-	textureNumber = LoadTextureRAW("heightField2.raw", 0);
+	textureNumber = LoadTextureRAW("texture.raw", 0);
 
 	lavaNumber = LoadTextureRAW("lava.raw", 0);
 
