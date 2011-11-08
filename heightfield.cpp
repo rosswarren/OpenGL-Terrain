@@ -2,30 +2,20 @@
 #include <stdio.h>
 #include "heightfield.h"
 
-static float terrainLightPos[4] = {0.0f, 0.1f, 0.1f, 0.0f};
-static float terrainDiffuseCol[3] = {1.0f, 1.0f, 1.0f};
-static float terrainAmbientCol[3] = {0.04f, 0.04f, 0.04f};
-static int terrainSimLight = 1;
-
 static GLuint textureNumber;
 static GLuint lavaNumber;
 
-bool HeightField::Create(char *hFileName, char *tFileName, const int hWidth, const int hHeight) {	
-	waterheight = -250.0f;
-	hmHeight = hHeight;
-	hmWidth = hWidth;
+bool HeightField::Create() {	
+	waterheight = 480.0f;
+	int height = 1024;
+	int width = 1024;
 	
 	FILE *fp;
-	fp = fopen(hFileName, "rb");
-	fread(hHeightField, 1, hWidth * hHeight, fp);
+	fp = fopen("heightField.raw", "rb");
+	fread(hHeightField, 1, height * width, fp);
 	fclose(fp);
 
-	FILE *terrain;
-	terrain = fopen(hFileName, "rb");
-	fread(texture, 1, hWidth * hHeight, terrain);
-	fclose(terrain);
-
-	vhVertexCount = (int)(hmHeight * hHeight * 6) / (hLOD * hLOD);
+	vhVertexCount = (int)(height * width * 6) / (hLOD * hLOD);
 	vhVertices = new Vert[vhVertexCount];
 	vhTexCoords = new TexCoord[vhVertexCount];
 	vhNormals = new Normal[vhVertexCount];
@@ -34,9 +24,9 @@ bool HeightField::Create(char *hFileName, char *tFileName, const int hWidth, con
 	float flX;
 	float flZ;
 
-	for (int hMapX = 0; hMapX < hmWidth; hMapX+=hLOD){
-		for (int hMapZ = 0; hMapZ < hmHeight; hMapZ+=hLOD){
-			for (int nTri = 0; nTri < 6; nTri++){
+	for (int hMapX = 0; hMapX < width; hMapX+=hLOD) {
+		for (int hMapZ = 0; hMapZ < height; hMapZ+=hLOD) {
+			for (int nTri = 0; nTri < 6; nTri++) {
 				flX = (float)hMapX + ((nTri == 1 || nTri == 2 || nTri == 5) ? hLOD : 0);
 				flZ = (float)hMapZ + ((nTri == 1 || nTri == 4 || nTri == 5) ? hLOD : 0);
 
@@ -56,22 +46,20 @@ bool HeightField::Create(char *hFileName, char *tFileName, const int hWidth, con
 	Init();
 
 	textureNumber = LoadTextureRAW("texture.raw", 0);
-
 	lavaNumber = LoadTextureRAW("lava.raw", 0);
 
 	return true;
 }
 
-// load a 1024x1024 RGB .RAW file as a texture
 GLuint HeightField::LoadTextureRAW( const char * filename, int wrap ) {
     GLuint texture;
     int width, height;
-    BYTE * data;
+    GLubyte * data;
     FILE * file;
 
     // open texture data
     file = fopen( filename, "rb" );
-    if ( file == NULL ) return 0;
+    if (file == NULL) return 0;
 
     // allocate buffer
     width = 1024;
@@ -81,7 +69,7 @@ GLuint HeightField::LoadTextureRAW( const char * filename, int wrap ) {
 
     // read texture data
     fread( data, width * height * 3, 1, file );
-    fclose( file );
+    fclose(file);
 
     // allocate a texture name
     glGenTextures( 1, &texture );
@@ -93,18 +81,18 @@ GLuint HeightField::LoadTextureRAW( const char * filename, int wrap ) {
     glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
     // when texture area is small, bilinear filter the closest mipmap
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                     GL_LINEAR_MIPMAP_NEAREST );
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+
     // when texture area is large, bilinear filter the first mipmap
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // if wrap is true, the texture wraps over at the edges (repeat)
     //       ... false, the texture ends at the edges (clamp)
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap ? GL_REPEAT : GL_CLAMP );
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap ? GL_REPEAT : GL_CLAMP );
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap ? GL_REPEAT : GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap ? GL_REPEAT : GL_CLAMP);
 
     // build our texture mipmaps
-    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, width, height, GL_RGB, GL_UNSIGNED_BYTE, data );
+    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
 
     // free buffer
     free(data);
@@ -125,6 +113,7 @@ void HeightField::Init() {
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBONormals);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, vhVertexCount * 3 * sizeof(float), vhNormals, GL_STATIC_DRAW_ARB);
 
+	// wipe the arrays since they are graphics memory
 	delete [] vhVertices;
 	vhVertices = NULL;
 
@@ -134,9 +123,6 @@ void HeightField::Init() {
 	delete [] vhNormals;
 	vhNormals = NULL;
 
-	return;
-
-
 	/* DOTS 
 	glBegin(GL_POINTS);
 		for (int hMapX = 0; hMapX < hmWidth; hMapX++) {
@@ -145,7 +131,6 @@ void HeightField::Init() {
 			}
 		}
 	glEnd();   */
-
 }
 
 void HeightField::Cube() {
@@ -180,7 +165,7 @@ void HeightField::Cube() {
     glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
     glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Top Right Of The Texture and Quad
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
-glEnd();
+	glEnd();
 }
 
 void HeightField::Render() {
@@ -193,12 +178,13 @@ void HeightField::Render() {
 	glPushMatrix();
 	glTranslatef(512.0f, -250.0f, 512.0f);
 	glScalef(512.0f, 400.0f, 512.0f);
-	glNormal3f(0, 1, 0);
+	glNormal3f(0, 1.0f, 0);
 	Cube();
 	glPopMatrix();
-	
 	glDisable(GL_TEXTURE_2D);
-
+	
+	GLfloat bulidingcolor[4] = {0.1f, 0.1f, 0.1f, 1.0f};
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, bulidingcolor); // material colour
     glPushMatrix();
 	glTranslatef(740.0f, 210.0f, 250.0f);
 	glScalef(20.0f, 60.0f, 20.0f);
