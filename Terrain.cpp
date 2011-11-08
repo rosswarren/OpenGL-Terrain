@@ -63,7 +63,7 @@ void Init (void) {
 	initExtensions();
 	hField.hLOD = 8;
 
-	hField.Create("heightField.raw", "texture.raw", 1024, 1024);
+	hField.Create();
 
 	GLfloat pos[4] = {5.0f, 100.0f, 10.0f, 0.0f};
 	GLfloat whiskcolor[3] = {0.74f, 0.74f, 0.74f};

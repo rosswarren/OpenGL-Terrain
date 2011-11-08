@@ -37,7 +37,7 @@ private:
 	unsigned int vhVBOTexCoords;
 	unsigned int vhVBONormals;
 public:
-	bool Create(char *hFileName, char *tFileName, const int hWidth, const int hHeight);
+	bool Create();
 	void Render();
 	void Init();
 	void Cube();
