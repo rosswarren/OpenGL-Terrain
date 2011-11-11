@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <math.h>
 #include "SkyBox.h"
 #include "RawLoader.h"
 #include "Shapes.h"

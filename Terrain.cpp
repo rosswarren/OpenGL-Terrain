@@ -13,6 +13,8 @@
 #include "heightfield.h"
 #include "SkyBox.h"
 #include "Lava.h"
+#include "Building.h"
+#include "Refinery.h"
 
 #pragma comment(lib,"glew32.lib")
 
@@ -23,6 +25,8 @@ float cScale = 1.0;
 
 SkyBox skyBox;
 Lava lava;
+Building building;
+Refinery refinery;
 
 HeightField hField;
 
@@ -40,7 +44,7 @@ void fog(void) {
 	glFogfv(GL_FOG_COLOR, fogColor);
     glFogi(GL_FOG_MODE, GL_LINEAR);
     glFogf(GL_FOG_START, 200.0f);
-    glFogf(GL_FOG_END, 650.0f);
+    glFogf(GL_FOG_END, 850.0f);
 }
 
 void display (void) {
@@ -52,6 +56,8 @@ void display (void) {
 
 	skyBox.Display();
 	lava.Display();
+	building.Display();
+	refinery.Display();
 
     fog();
 
@@ -102,6 +108,8 @@ void Init (void) {
 
 	skyBox.Init();
 	lava.Init();
+	building.Init();
+	refinery.Init();
 }
 
 void mouseMovement(int x, int y) {
@@ -150,6 +158,8 @@ void keyboard (unsigned char key, int x, int y) {
 		hField.waterheight -= 10.0f;
 		break;
 	}
+
+	ypos = 180.0f;
 }
 
 void reshape (int w, int h) {

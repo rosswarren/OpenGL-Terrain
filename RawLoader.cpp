@@ -11,9 +11,8 @@ RawLoader::~RawLoader(void)
 {
 }
 
-GLuint RawLoader::LoadTextureRAW(const char * filename, int wrap, int size) {
+GLuint RawLoader::LoadTextureRAW(const char * filename, int wrap, int width, int height) {
     GLuint texture;
-    int width, height;
     GLubyte * data;
     FILE * file;
 
@@ -22,8 +21,8 @@ GLuint RawLoader::LoadTextureRAW(const char * filename, int wrap, int size) {
     if (file == NULL) return 0;
 
     // allocate buffer
-    width = size;
-    height = size;
+    width = width;
+    height = height;
 
 	int memorySize = width * height * 3;
 

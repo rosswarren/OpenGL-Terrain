@@ -8,6 +8,6 @@ public:
 	RawLoader(void);
 	~RawLoader(void);
 
-	GLuint LoadTextureRAW(const char * filename, int wrap, int size);
+	GLuint LoadTextureRAW(const char * filename, int wrap, int width, int height);
 };
 

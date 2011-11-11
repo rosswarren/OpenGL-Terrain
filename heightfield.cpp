@@ -46,7 +46,7 @@ bool HeightField::Create() {
 	Init();
 
 	RawLoader rawLoader;
-	textureNumber = rawLoader.LoadTextureRAW("texture.raw", 0, 1024);
+	textureNumber = rawLoader.LoadTextureRAW("texture.raw", 0, 1024, 1024);
 
 	return true;
 }
@@ -88,14 +88,10 @@ void HeightField::Render() {
 	GLfloat whiskcolor[4] = {0.74f, 0.74f, 0.74f, 1.0f};
 	GLfloat watercolour[4] = {1.0f, 0.0f, 0.0f, 1.0f};
 	GLfloat specular[3] = {1.0f, 1.0f, 1.0f};
-	
-	GLfloat bulidingcolor[4] = {0.1f, 0.1f, 0.1f, 1.0f};
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, bulidingcolor); // material colour
-    glPushMatrix();
-	glTranslatef(740.0f, 210.0f, 250.0f);
-	glScalef(20.0f, 60.0f, 20.0f);
-	glutSolidCube(1.0f);
-	glPopMatrix();
+
+	glPushMatrix();
+	glScalef(1.0f, 1.2f, 1.0f);
+	glTranslatef(0.0f, -20.0f, 0.0f);
 
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiskcolor); // material colour
 	glMaterialfv(GL_FRONT, GL_SPECULAR, specular); // the specular light colour
@@ -123,4 +119,6 @@ void HeightField::Render() {
 
 	glDisable(GL_TEXTURE_2D);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glPopMatrix();
 }
