@@ -1,5 +1,10 @@
+#pragma once
+
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include "SkyBox.h"
+#include "RawLoader.h"
+#include "Shapes.h"
 
 class Vert{
 	public:  
@@ -40,11 +45,8 @@ public:
 	bool Create();
 	void Render();
 	void Init();
-	void Cube();
-	GLuint LoadTextureRAW( const char * filename, int wrap );
 	int hLOD;
 	GLubyte hHeightField[1024][1024];
 	GLubyte texture[1024][1024];
-	GLubyte lavaTexture[1024][1024];
 	float waterheight;
 };

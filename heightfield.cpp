@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include "heightfield.h"
+#include "RawLoader.h"
 
 static GLuint textureNumber;
-static GLuint lavaNumber;
 
 bool HeightField::Create() {	
 	waterheight = 480.0f;
@@ -45,61 +45,10 @@ bool HeightField::Create() {
 
 	Init();
 
-	textureNumber = LoadTextureRAW("texture.raw", 0);
-	lavaNumber = LoadTextureRAW("lava.raw", 0);
+	RawLoader rawLoader;
+	textureNumber = rawLoader.LoadTextureRAW("texture.raw", 0, 1024);
 
 	return true;
-}
-
-GLuint HeightField::LoadTextureRAW( const char * filename, int wrap ) {
-    GLuint texture;
-    int width, height;
-    GLubyte * data;
-    FILE * file;
-
-    // open texture data
-    file = fopen( filename, "rb" );
-    if (file == NULL) return 0;
-
-    // allocate buffer
-    width = 1024;
-    height = 1024;
-
-	int memorySize = width * height * 3;
-
-	data = (BYTE *)malloc(memorySize);
-
-    // read texture data
-    fread(data, memorySize, 1, file);
-    fclose(file);
-
-    // allocate a texture name
-    glGenTextures(1, &texture);
-
-    // select our current texture
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    // select modulate to mix texture with color for shading
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    // when texture area is small, bilinear filter the closest mipmap
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-
-    // when texture area is large, bilinear filter the first mipmap
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // if wrap is true, the texture wraps over at the edges (repeat)
-    //       ... false, the texture ends at the edges (clamp)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap ? GL_REPEAT : GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap ? GL_REPEAT : GL_CLAMP);
-
-    // build our texture mipmaps
-    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
-
-    // free buffer
-    free(data);
-
-    return texture;
 }
 
 void HeightField::Init() {
@@ -135,63 +84,10 @@ void HeightField::Init() {
 	glEnd();   */
 }
 
-void HeightField::Cube() {
-	glBegin(GL_QUADS);
-    // Front Face
-	glNormal3f(0.0f, 0.0f, 1.0f);
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
-    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
-    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Top Right Of The Texture and Quad
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Top Left Of The Texture and Quad
-    // Back Face
-	glNormal3f(0.0f, 0.0f, -1.0f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Bottom Right Of The Texture and Quad
-    glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
-    glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
-    glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Bottom Left Of The Texture and Quad
-    // Top Face
-	glNormal3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
-    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
-    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
-    // Bottom Face
-	glNormal3f(0.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Top Right Of The Texture and Quad
-    glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Top Left Of The Texture and Quad
-    glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
-    glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
-    // Right face
-	glNormal3f(-1.0f, 0.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Bottom Right Of The Texture and Quad
-    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
-    glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Top Left Of The Texture and Quad
-    glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
-    // Left Face
-	glNormal3f(1.0f, 0.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Bottom Left Of The Texture and Quad
-    glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
-    glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Top Right Of The Texture and Quad
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
-
-	glNormal3f(0.0f, 1.0f, 0.0f);
-	glEnd();
-}
-
 void HeightField::Render() {
 	GLfloat whiskcolor[4] = {0.74f, 0.74f, 0.74f, 1.0f};
 	GLfloat watercolour[4] = {1.0f, 0.0f, 0.0f, 1.0f};
 	GLfloat specular[3] = {1.0f, 1.0f, 1.0f};
-	
-	glEnable(GL_TEXTURE_2D); // enable drawing the texture
-	glBindTexture(GL_TEXTURE_2D, lavaNumber); // bind the texture
-	glPushMatrix();
-	glTranslatef(512.0f, -250.0f, 512.0f);
-	glScalef(512.0f, 400.0f, 512.0f);
-	glNormal3f(0, 1.0f, 0);
-	Cube();
-	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
 	
 	GLfloat bulidingcolor[4] = {0.1f, 0.1f, 0.1f, 1.0f};
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, bulidingcolor); // material colour

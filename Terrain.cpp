@@ -5,18 +5,24 @@
 #include <fstream>
 #include <assert.h>
 
+
 #ifndef M_PI
 #define M_PI 3.14159265f
 #endif
 
 #include "heightfield.h"
+#include "SkyBox.h"
+#include "Lava.h"
 
 #pragma comment(lib,"glew32.lib")
 
-float xpos = 851.078f, ypos = 351.594f, zpos = 281.033f, xrot = 758.0f, yrot = 238.0f, angle = 0.0f;
+float xpos = 512.0f, ypos = 351.594f, zpos = 512.033f, xrot = 758.0f, yrot = 238.0f, angle = 0.0f;
 float lastx, lasty;
 float bounce;
 float cScale = 1.0;
+
+SkyBox skyBox;
+Lava lava;
 
 HeightField hField;
 
@@ -29,17 +35,25 @@ void camera (void) {
 	glTranslated(-xpos, -ypos, -zpos);
 }
 
-void display (void) {
+void fog(void) {
 	GLfloat fogColor[] = {0.5f, 0.5f, 0.5f, 1};
+	glFogfv(GL_FOG_COLOR, fogColor);
+    glFogi(GL_FOG_MODE, GL_LINEAR);
+    glFogf(GL_FOG_START, 200.0f);
+    glFogf(GL_FOG_END, 650.0f);
+}
+
+void display (void) {
 	glClearColor(0.5, 0.5, 0.5, 1);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();  
+    glLoadIdentity();
+
 	camera();
 
-    glFogfv(GL_FOG_COLOR, fogColor);
-    glFogi(GL_FOG_MODE, GL_LINEAR);
-    glFogf(GL_FOG_START, 0.0f);
-    glFogf(GL_FOG_END, 1000.0f);
+	skyBox.Display();
+	lava.Display();
+
+    fog();
 
 	glPushMatrix();
 	hField.Render();
@@ -85,6 +99,9 @@ void Init (void) {
 
 	glEnable(GL_BLEND); //Enable alpha blending
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Set the blend function
+
+	skyBox.Init();
+	lava.Init();
 }
 
 void mouseMovement(int x, int y) {
@@ -133,20 +150,19 @@ void keyboard (unsigned char key, int x, int y) {
 		hField.waterheight -= 10.0f;
 		break;
 	}
-
 }
 
 void reshape (int w, int h) {
-	glViewport (0, 0, (GLsizei)w, (GLsizei)h);
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	gluPerspective (60, (GLfloat)w / (GLfloat)h, 1.0, 3000.0);
-	glMatrixMode (GL_MODELVIEW);
+	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(60, (GLfloat)w / (GLfloat)h, 1.0, 3000.0);
+	glMatrixMode(GL_MODELVIEW);
 }
 
 int main (int argc, char **argv) {
     glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowSize(500, 500);
 	glutInitWindowPosition(100, 100);
     glutCreateWindow("A basic OpenGL Window");
