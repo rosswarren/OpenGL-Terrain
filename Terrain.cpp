@@ -6,17 +6,29 @@
 static GLuint textureNumber;
 
 Terrain::Terrain() {
-	hLOD = 8;
+	hLOD = 32;
+	loaded = false;
 }
 
 void Terrain::Init() {
 	int height = 1024;
 	int width = 1024;
-	
-	FILE *fp;
-	fp = fopen("heightmap.raw", "rb");
-	fread(hHeightField, 1, height * width, fp);
-	fclose(fp);
+
+	if (!loaded) {
+		FILE *fp;
+		fp = fopen("heightmap.raw", "rb");
+
+		if (fp == NULL) {
+			throw "heightmap.raw not found";
+		}
+
+		fread(hHeightField, 1, height * width, fp);
+		fclose(fp);
+		loaded = true;
+
+		RawLoader rawLoader;
+		textureNumber = rawLoader.LoadTextureRAW("terraintexture.raw", 0, 1024, 1024);
+	}
 
 	vhVertexCount = (int)(height * width * 6) / (hLOD * hLOD);
 	vhVertices = new Vert[vhVertexCount];
@@ -67,9 +79,6 @@ void Terrain::Init() {
 
 	delete [] vhNormals;
 	vhNormals = NULL;
-
-	RawLoader rawLoader;
-	textureNumber = rawLoader.LoadTextureRAW("terraintexture.raw", 0, 1024, 1024);
 }
 
 GLuint Terrain::GetComplexity() {
@@ -111,7 +120,6 @@ void Terrain::Display() {
 	glMateriali(GL_FRONT, GL_SHININESS, 120); // how shiney it is
 
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnable(GL_TEXTURE_2D); // enable drawing the texture
 	glBindTexture(GL_TEXTURE_2D, textureNumber); // bind the texture
 
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBOTexCoords);
@@ -129,8 +137,6 @@ void Terrain::Display() {
 	glDrawArrays(GL_TRIANGLES, 0, vhVertexCount);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
-
-	glDisable(GL_TEXTURE_2D);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glPopMatrix();
@@ -138,16 +144,20 @@ void Terrain::Display() {
 
 void Terrain::DrawDots() {
 	glPushMatrix();
-	glScalef(1.0f, 1.2f, 1.0f);
-	glTranslatef(0.0f, -10.0f, 0.0f);
+	//glScalef(1.0f, 1.2f, 1.0f);
+	//glTranslatef(0.0f, -10.0f, 0.0f);
 	/*  DOTS */ 
 	glBegin(GL_POINTS);
 	glPointSize(4.0);
-	for (int hMapX = 0; hMapX < hmWidth; hMapX++) {
-		for (int hMapZ = 0; hMapZ < hmHeight; hMapZ++) {
+
+	glNormal3f(0.0f, 1.0f, 0.0f);
+
+	for (unsigned int hMapX = 0; hMapX < hmWidth; hMapX++) {
+		for (unsigned int hMapZ = 0; hMapZ < hmHeight; hMapZ++) {
 			glVertex3f((GLfloat)hMapX, hHeightField[hMapX][hMapZ], (GLfloat)hMapZ);	
 		}
 	}
+
 	glEnd(); 
 	glPopMatrix();
 }

@@ -17,7 +17,7 @@
 
 #pragma comment(lib,"glew32.lib")
 
-float xpos = 512.0f, ypos = 351.594f, zpos = 512.033f, xrot = 758.0f, yrot = 238.0f, angle = 0.0f;
+float xpos = 512.0f, ypos = 512.0f, zpos = 512.0f, xrot = 758.0f, yrot = 238.0f, angle = 0.0f;
 float lastx, lasty;
 float bounce;
 float cScale = 1.0;
@@ -26,6 +26,7 @@ int frame = 0;
 int timebase = 0;
 int fps = 0;
 bool wireframe = false;
+bool refinerydisplay = false;
 
 SkyBox skyBox;
 Lava lava;
@@ -150,11 +151,13 @@ void display (void) {
 	// display everything
 	skyBox.Display();
 	building.Display();
-	refinery.Display();
+
+	if (refinerydisplay) refinery.Display();
+
 	trees.Display();
 	terrain.Display();
 	lava.Display();
-	terrain.DrawDots();
+	//terrain.DrawDots();
 
 	glPopMatrix();
 
@@ -171,16 +174,13 @@ void initExtensions(void){
 }
 
 void Init(void) {
-	glDepthFunc(GL_LEQUAL);
-
 	initExtensions();
-	GLfloat pos[4] = {5.0f, 100.0f, 10.0f, 0.0f};
+	GLfloat pos[3] = {1024.0f, 800.0f, 0.0f};
 	GLfloat whiskcolor[3] = {0.74f, 0.74f, 0.74f};
-	GLfloat specular[3] = {0.0f, 0.0f, 0.0f};
+	//GLfloat specular[3] = {0.0f, 0.0f, 0.0f};
 	GLfloat ambient[3] = {0.1f, 0.1f, 0.1f};
 	GLfloat diffuse[3] = {0.8f, 0.8f, 0.8f};
 
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
@@ -189,8 +189,10 @@ void Init(void) {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);//less or equal
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_BLEND); //Enable alpha blending
+	glEnable(GL_TEXTURE_2D);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Set the blend function
 
@@ -276,6 +278,9 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'v':
 		switchWireframe();
+		break;
+	case 'r':
+		refinerydisplay = !refinerydisplay;
 		break;
 	}
 }

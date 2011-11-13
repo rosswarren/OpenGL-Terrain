@@ -20,7 +20,10 @@ GLuint RawLoader::LoadTextureRAW(char * filename, int wrap, int width, int heigh
 
     // open texture data
     file = fopen(filename, "rb");
-    if (file == NULL) return 0;
+
+    if (file == NULL) {
+		throw "File not found";
+	}
 
     // allocate buffer
     width = width;

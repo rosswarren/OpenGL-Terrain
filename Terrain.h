@@ -47,7 +47,7 @@ private:
 	unsigned int vhVBOVertices;
 	unsigned int vhVBOTexCoords;
 	unsigned int vhVBONormals;
-
+	bool loaded;
 	GLuint hLOD;
 public:
 	void Display();

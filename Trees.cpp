@@ -3,8 +3,9 @@
 
 
 Trees::Trees(void) {
-	treeLvl = 6;
+	treeLvl = 4;
 	leaves = false;
+	loaded = false;
 }
 
 
@@ -12,19 +13,30 @@ Trees::~Trees(void) {
 }
 
 void Trees::DecreaseComplexity(void) {
-	glDeleteLists(displayList, 1);
+	for (unsigned int i = 0; i < 5; i++) {
+		glDeleteLists(treeLists[i], 1);
+	}
+
 	if (treeLvl > 1) treeLvl--;
+
 	Init();
 }
 
 void Trees::IncreaseComplexity(void) {
-	glDeleteLists(displayList, 1);
+	for (unsigned int i = 0; i < 5; i++) {
+		glDeleteLists(treeLists[i], 1);
+	}
+
 	if (treeLvl < 8) treeLvl++;
+
 	Init();
 }
 
 void Trees::Regen(void) {
-	glDeleteLists(displayList, 1);
+	for (unsigned int i = 0; i < 5; i++) {
+		glDeleteLists(treeLists[i], 1);
+	}
+	
 	Init();
 }
 
@@ -40,36 +52,35 @@ void Trees::Init(void) {
 	RawLoader rawLoader;
 	Shapes shapes;
 
-	quadric = gluNewQuadric();
-	gluQuadricNormals(quadric, GL_TRUE);
-	gluQuadricTexture(quadric, 1);
+	if (!loaded) {
+		quadric = gluNewQuadric();
+		gluQuadricNormals(quadric, GL_TRUE);
+		gluQuadricTexture(quadric, 1);
 
-	woodTexture = rawLoader.LoadTextureRAW("woodtexture.raw", 1, 512, 512);
+		woodTexture = rawLoader.LoadTextureRAW("woodtexture.raw", 1, 512, 512);
+		loaded = true;
+	}
 
-	// load the skybox to a display list
-	displayList = glGenLists(1);
-	glNewList(displayList, GL_COMPILE);
-
-	glEnable(GL_TEXTURE_2D); // enable drawing the texture
-	glPushMatrix();
-	glBindTexture(GL_TEXTURE_2D, woodTexture); // bind the texture
-	tree(treeLvl);
-	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
-	glEndList();
+	for (unsigned int i = 0; i < 5; i++) {
+		treeLists[i] = glGenLists(1);
+		glNewList(treeLists[i], GL_COMPILE);
+		glScalef(17.0f, 17.0f, 17.0f);
+		tree(treeLvl);
+		glEndList();
+	}
 }
 
 void Trees::Display(void) {
+	glBindTexture(GL_TEXTURE_2D, woodTexture); // bind the texture
+
 	glPushMatrix();
 	glTranslatef(440.0f, 203.0f, 450.0f);
-	glScalef(17.0f, 17.0f, 17.0f);
-	glCallList(displayList);
+	glCallList(treeLists[0]);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(570.0f, 167.0f, 520.0f);
-	glScalef(17.0f, 17.0f, 17.0f);
-	glCallList(displayList);
+	glCallList(treeLists[1]);
 	glPopMatrix();
 }
 

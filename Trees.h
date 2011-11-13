@@ -8,9 +8,10 @@ class Trees
 private:
 	GLUquadricObj* quadric;
 	GLuint woodTexture;
-	GLuint displayList;
+	GLuint treeLists[5];
 	int treeLvl;
 	bool leaves;
+	bool loaded;
 	void tree(int level);
 	int random(int min, int max);
 public:

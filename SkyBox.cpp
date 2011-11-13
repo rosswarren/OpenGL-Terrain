@@ -37,11 +37,7 @@ void SkyBox::Init(void) {
 
 	// Turn on Emissive lighting. We don't want shadows or dark patches on the skybox
 	glMaterialfv(GL_FRONT, GL_EMISSION, emissiveMaterial);
-
-	glEnable(GL_TEXTURE_2D);
 	glBindTexture( GL_TEXTURE_2D, skyTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glScalef(512.0f, 512.0f, 512.0f);
 	glTranslatef(1.0f, 0.6f, 1.0f);
@@ -111,8 +107,6 @@ void SkyBox::Init(void) {
 	//	glTexCoord2f(0.5f, 1.0f); glVertex3f(1.0f, -0.5f,  1.0f);
 	//	glTexCoord2f(0.25f, 1.0f); glVertex3f(1.0f, -0.5f, -1.0f);
 	//glEnd();
-
-	glDisable(GL_TEXTURE_2D);
 
 	// Turn off emissive lighting
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, nonEmissiveMaterial);

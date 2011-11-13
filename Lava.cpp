@@ -31,15 +31,11 @@ void Lava::Init(void) {
 
 	// Turn on Emissive lighting. We don't want shadows or dark patches on the skybox
 	glMaterialfv(GL_FRONT, GL_EMISSION, emissiveMaterial);
-	
-	glEnable(GL_TEXTURE_2D); // enable drawing the texture
 	glPushMatrix();
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, lavacolour); // material colour
 	glBindTexture(GL_TEXTURE_2D, lavaTexture); // bind the texture
 	glNormal3f(0, 1.0f, 0);
 	shapes.cuboid(1024.0f, 100.0f, 1024.0f);
-	
-	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 
 	// Turn off emissive lighting
@@ -49,7 +45,9 @@ void Lava::Init(void) {
 
 void Lava::Display(void) {
 	glDepthMask(GL_FALSE);
+	glPushMatrix();
 	glTranslatef(512.0f, height, 512.0f);
 	glCallList(displayList);
+	glPopMatrix();
 	glDepthMask(GL_TRUE);
 }

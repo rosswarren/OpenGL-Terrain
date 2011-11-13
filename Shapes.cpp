@@ -218,7 +218,8 @@ void Shapes::drawWhisk(int direction, double angle, int smallgear, int whisk, GL
 	glPushMatrix();
 	glRotated(whiskangle, 0.0, 1.0, 0.0); // spin the whisk and gear
 	glRotatef(90.0, 1.0, 0.0, 0.0); //rotate 90 degrees so it is facing downwards
-	glCallList(smallgear); // draw the plastic gear
+	gear(1.0f, 4.0f, 5.0f, 12, 0.7f);
+	//glCallList(smallgear); // draw the plastic gear
 	glTranslatef(0.0f, 0.0f, -6.0f); // move down 6
 	glCallList(whisk);  // draw the whisk part	
 	glPopMatrix();
