@@ -1,12 +1,13 @@
 #pragma once
 
-#include "heightfield.h"
+#include "Terrain.h"
 
 class Refinery
 {
 private:
 	GLUquadricObj* quadric;
-	GLint smallgear, biggear, innergearsupport, strut, topstrut, angledstrut, handle, whisk;
+	GLuint smallgear, biggear, innergearsupport, strut, topstrut, angledstrut, handle, whisk;
+	GLuint rustTexture;
 	double angle;
 public:
 	Refinery(void);

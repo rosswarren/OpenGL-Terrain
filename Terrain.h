@@ -3,9 +3,14 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <math.h>
+#include <string>
+#include <sstream>
+#include <iostream>
 #include "SkyBox.h"
 #include "RawLoader.h"
 #include "Shapes.h"
+
+
 
 class Vert{
 	public:  
@@ -27,11 +32,11 @@ class Normal {
 		float z;
 };
 
-class HeightField {
+class Terrain {
 private:
-	int hmHeight;
-	int hmWidth;
-	int terrainList;
+	unsigned int hmHeight;
+	unsigned int hmWidth;
+	unsigned int terrainList;
 	unsigned int tID[2];
 
 	int vhVertexCount;
@@ -42,12 +47,16 @@ private:
 	unsigned int vhVBOVertices;
 	unsigned int vhVBOTexCoords;
 	unsigned int vhVBONormals;
+
+	GLuint hLOD;
 public:
-	bool Create();
-	void Render();
+	void Display();
 	void Init();
-	int hLOD;
 	GLubyte hHeightField[1024][1024];
 	GLubyte texture[1024][1024];
-	float waterheight;
+	Terrain(void);
+	void DrawDots(void);
+	void IncreaseComplexity(void);
+	void DecreaseComplexity(void);
+	GLuint GetComplexity(void);
 };

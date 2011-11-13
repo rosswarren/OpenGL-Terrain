@@ -195,6 +195,8 @@ void Shapes::innergearsupports(void) {
 
 /** draws a cylinder with capped ends */
 void Shapes::cylinder(double height, double radiusBase, double radiusTop, int slices, int stacks, GLUquadricObj* quadric) {
+	//gluQuadricDrawstyle(quadric, GLU_FILL);
+	gluQuadricTexture(quadric, 1);
 	gluCylinder(quadric, radiusBase, radiusTop, height, slices, stacks); //first draw the cylinder
 
 	// Draw the top disk cap

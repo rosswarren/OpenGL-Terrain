@@ -1,6 +1,6 @@
 #pragma once
 
-#include "heightfield.h"
+#include "Terrain.h"
 
 class Shapes
 {

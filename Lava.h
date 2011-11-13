@@ -1,5 +1,5 @@
 #pragma once
-#include "heightfield.h"
+#include "Terrain.h"
 
 class Lava {
 private:
@@ -11,5 +11,7 @@ public:
 
 	void Init();
 	void Display();
+
+	GLfloat height;
 };
 

@@ -1,187 +1,153 @@
 #include "stdafx.h"
-#include <math.h>
 #include <stdio.h>
-#include <string.h>
-#include <fstream>
-#include <assert.h>
+#include "Terrain.h"
+#include "RawLoader.h"
 
+static GLuint textureNumber;
 
-#ifndef M_PI
-#define M_PI 3.14159265f
-#endif
-
-#include "heightfield.h"
-#include "SkyBox.h"
-#include "Lava.h"
-#include "Building.h"
-#include "Refinery.h"
-
-#pragma comment(lib,"glew32.lib")
-
-float xpos = 512.0f, ypos = 351.594f, zpos = 512.033f, xrot = 758.0f, yrot = 238.0f, angle = 0.0f;
-float lastx, lasty;
-float bounce;
-float cScale = 1.0;
-
-SkyBox skyBox;
-Lava lava;
-Building building;
-Refinery refinery;
-
-HeightField hField;
-
-void camera (void) {
-	int posX = (int)xpos;
-	int posZ = (int)zpos;
-
-	glRotatef(xrot, 1.0f, 0.0f, 0.0f);
-	glRotatef(yrot, 0.0f, 1.0f, 0.0f); 
-	glTranslated(-xpos, -ypos, -zpos);
+Terrain::Terrain() {
+	hLOD = 8;
 }
 
-void fog(void) {
-	GLfloat fogColor[] = {0.5f, 0.5f, 0.5f, 1};
-	glFogfv(GL_FOG_COLOR, fogColor);
-    glFogi(GL_FOG_MODE, GL_LINEAR);
-    glFogf(GL_FOG_START, 200.0f);
-    glFogf(GL_FOG_END, 850.0f);
-}
+void Terrain::Init() {
+	int height = 1024;
+	int width = 1024;
+	
+	FILE *fp;
+	fp = fopen("heightmap.raw", "rb");
+	fread(hHeightField, 1, height * width, fp);
+	fclose(fp);
 
-void display (void) {
-	glClearColor(0.5, 0.5, 0.5, 1);
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
+	vhVertexCount = (int)(height * width * 6) / (hLOD * hLOD);
+	vhVertices = new Vert[vhVertexCount];
+	vhTexCoords = new TexCoord[vhVertexCount];
+	vhNormals = new Normal[vhVertexCount];
 
-	camera();
+	int nIndex = 0;
+	float flX;
+	float flZ;
 
-	skyBox.Display();
-	lava.Display();
-	building.Display();
-	refinery.Display();
+	for (int hMapX = 0; hMapX < width; hMapX+=hLOD) {
+		for (int hMapZ = 0; hMapZ < height; hMapZ+=hLOD) {
+			for (int nTri = 0; nTri < 6; nTri++) {
+				flX = (float)hMapX + ((nTri == 1 || nTri == 2 || nTri == 5) ? hLOD : 0);
+				flZ = (float)hMapZ + ((nTri == 1 || nTri == 4 || nTri == 5) ? hLOD : 0);
 
-    fog();
-
-	glPushMatrix();
-	hField.Render();
-	glPopMatrix();
-
-	glutSwapBuffers();
-}
-
-void initExtensions(void){
-	glGenBuffersARB = (PFNGLGENBUFFERSARBPROC) wglGetProcAddress("glGenBuffersARB");
-	glBindBufferARB = (PFNGLBINDBUFFERARBPROC) wglGetProcAddress("glBindBufferARB");
-	glBufferDataARB = (PFNGLBUFFERDATAARBPROC) wglGetProcAddress("glBufferDataARB");
-	glDeleteBuffersARB = (PFNGLDELETEBUFFERSARBPROC) wglGetProcAddress("glDeleteBuffersARB");
-}
-
-void Init (void) {
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_FOG);
-	glDepthFunc(GL_LEQUAL);
-
-	initExtensions();
-	hField.hLOD = 8;
-
-	hField.Create();
-
-	GLfloat pos[4] = {5.0f, 100.0f, 10.0f, 0.0f};
-	GLfloat whiskcolor[3] = {0.74f, 0.74f, 0.74f};
-	GLfloat specular[3] = {0.0f, 0.0f, 0.0f};
-	GLfloat ambient[3] = {0.1f, 0.1f, 0.1f};
-	GLfloat diffuse[3] = {0.8f, 0.8f, 0.8f};
-
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, pos);
-
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_DEPTH_TEST);
-
-	glEnable(GL_NORMALIZE);
-
-	glEnable(GL_BLEND); //Enable alpha blending
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Set the blend function
-
-	skyBox.Init();
-	lava.Init();
-	building.Init();
-	refinery.Init();
-}
-
-void mouseMovement(int x, int y) {
-	int diffx=x-lastx; 
-	int diffy=y-lasty; 
-	lastx=x; 
-	lasty=y; 
-	xrot += (float) diffy; 
-	yrot += (float) diffx;
-}
-
-void keyboard (unsigned char key, int x, int y) {
-	float xrotrad, yrotrad;
-
-	switch(key) {
-	case 'w':
-		yrotrad = (yrot / 180.0f * M_PI);
-		xrotrad = (xrot / 180.0f * M_PI); 
-		xpos += float(sin(yrotrad)) * cScale;
-		zpos -= float(cos(yrotrad)) * cScale;
-		ypos -= float(sin(xrotrad)) ;
-		bounce += 0.04f;
-		break;
-	case 'a':
-		yrotrad = (yrot / 180.0f * M_PI);
-		xpos -= float(cos(yrotrad)) * cScale;
-		zpos -= float(sin(yrotrad)) * cScale;
-		break;
-	case 's':
-		yrotrad = (yrot / 180.0f * M_PI);
-		xrotrad = (xrot / 180.0f * M_PI); 
-		xpos -= float(sin(yrotrad)) * cScale;
-		zpos += float(cos(yrotrad)) * cScale;
-		ypos += float(sin(xrotrad));
-		bounce += 0.04f;
-		break;
-	case 'd':
-		yrotrad = (yrot / 180.0f * M_PI);
-		xpos += float(cos(yrotrad)) * cScale;
-		zpos += float(sin(yrotrad)) * cScale;
-		break;
-	case 'e':
-		hField.waterheight += 10.0f;
-		break;
-	case 'f':
-		hField.waterheight -= 10.0f;
-		break;
+				vhVertices[nIndex].x = flX;
+				vhVertices[nIndex].y = hHeightField[(int)flX][(int)flZ];
+				vhVertices[nIndex].z = flZ;
+				vhTexCoords[nIndex].u = flX / 1024;
+				vhTexCoords[nIndex].v = flZ / 1024;
+				vhNormals[nIndex].x = 0;
+				vhNormals[nIndex].y = 0;
+				vhNormals[nIndex].z = 0;
+				nIndex++;
+			}
+		}
 	}
 
-	ypos = 180.0f;
+	glGenBuffersARB(1, &vhVBOVertices);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBOVertices);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, vhVertexCount * 3 * sizeof(float), vhVertices, GL_STATIC_DRAW_ARB);
+
+	glGenBuffersARB(1, &vhVBOTexCoords);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBOTexCoords);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, vhVertexCount * 2 * sizeof(float), vhTexCoords, GL_STATIC_DRAW_ARB);
+
+	glGenBuffersARB(1, &vhVBONormals);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBONormals);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, vhVertexCount * 3 * sizeof(float), vhNormals, GL_STATIC_DRAW_ARB);
+
+	// wipe the arrays since they are graphics memory
+	delete [] vhVertices;
+	vhVertices = NULL;
+
+	delete [] vhTexCoords;
+	vhTexCoords = NULL;
+
+	delete [] vhNormals;
+	vhNormals = NULL;
+
+	RawLoader rawLoader;
+	textureNumber = rawLoader.LoadTextureRAW("terraintexture.raw", 0, 1024, 1024);
 }
 
-void reshape (int w, int h) {
-	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(60, (GLfloat)w / (GLfloat)h, 1.0, 3000.0);
-	glMatrixMode(GL_MODELVIEW);
+GLuint Terrain::GetComplexity() {
+	return hLOD;
 }
 
-int main (int argc, char **argv) {
-    glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA | GLUT_MULTISAMPLE);
-	glutInitWindowSize(500, 500);
-	glutInitWindowPosition(100, 100);
-    glutCreateWindow("A basic OpenGL Window");
+void Terrain::IncreaseComplexity() {
+	hLOD /= 2;
+
+	if (hLOD < 2) {
+		hLOD = 2;
+		return;
+	}
+
 	Init();
-    glutDisplayFunc(display);
-	glutIdleFunc(display);
-	glutReshapeFunc(reshape);
-	glutKeyboardFunc(keyboard);
-	glutPassiveMotionFunc(mouseMovement);
-    glutMainLoop ();
-    return 0;
+}
+
+void Terrain::DecreaseComplexity() {
+	hLOD *= 2;
+
+	if (hLOD > 32) {
+		hLOD = 32;
+		return;
+	}
+
+	Init();
+}
+
+void Terrain::Display() {
+	GLfloat terraincolour[4] = {0.7f, 0.7f, 0.7f, 1.0f};
+	GLfloat specular[3] = {1.0f, 1.0f, 1.0f};
+
+	glPushMatrix();
+	glScalef(1.0f, 1.2f, 1.0f);
+	glTranslatef(0.0f, -20.0f, 0.0f);
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, terraincolour); // material colour
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specular); // the specular light colour
+	glMateriali(GL_FRONT, GL_SHININESS, 120); // how shiney it is
+
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnable(GL_TEXTURE_2D); // enable drawing the texture
+	glBindTexture(GL_TEXTURE_2D, textureNumber); // bind the texture
+
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBOTexCoords);
+	glTexCoordPointer(2, GL_FLOAT, 0, (char *) NULL);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBOVertices);
+	glVertexPointer(3, GL_FLOAT, 0, (char *) NULL);
+
+	//glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBONormals);
+	//glNormalPointer(GL_FLOAT, 0, (char *) NULL);
+
+	glNormal3f(0, 1.0f, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, vhVertexCount);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	glDisable(GL_TEXTURE_2D);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glPopMatrix();
+}
+
+void Terrain::DrawDots() {
+	glPushMatrix();
+	glScalef(1.0f, 1.2f, 1.0f);
+	glTranslatef(0.0f, -10.0f, 0.0f);
+	/*  DOTS */ 
+	glBegin(GL_POINTS);
+	glPointSize(4.0);
+	for (int hMapX = 0; hMapX < hmWidth; hMapX++) {
+		for (int hMapZ = 0; hMapZ < hmHeight; hMapZ++) {
+			glVertex3f((GLfloat)hMapX, hHeightField[hMapX][hMapZ], (GLfloat)hMapZ);	
+		}
+	}
+	glEnd(); 
+	glPopMatrix();
 }

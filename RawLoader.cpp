@@ -11,10 +11,12 @@ RawLoader::~RawLoader(void)
 {
 }
 
-GLuint RawLoader::LoadTextureRAW(const char * filename, int wrap, int width, int height) {
+GLuint RawLoader::LoadTextureRAW(char * filename, int wrap, int width, int height) {
     GLuint texture;
     GLubyte * data;
     FILE * file;
+
+	//char * folder = "Textures\\";
 
     // open texture data
     file = fopen(filename, "rb");
@@ -26,7 +28,7 @@ GLuint RawLoader::LoadTextureRAW(const char * filename, int wrap, int width, int
 
 	int memorySize = width * height * 3;
 
-	data = (BYTE *)malloc(memorySize);
+	data = (GLubyte *)malloc(memorySize);
 
     // read texture data
     fread(data, memorySize, 1, file);
@@ -57,6 +59,12 @@ GLuint RawLoader::LoadTextureRAW(const char * filename, int wrap, int width, int
 
     // free buffer
     free(data);
+
+	std::stringstream ss;
+	std::string str;
+	ss << filename << " loaded \n";
+	str = ss.str();
+	std::cout << str;
 
     return texture;
 }

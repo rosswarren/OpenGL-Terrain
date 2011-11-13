@@ -19,12 +19,9 @@ SkyBox::~SkyBox(void) {
 * Initialise by loading textures etc.
 */
 void SkyBox::Init(void) {
-	//load textures
 	RawLoader rawLoader;
 
 	skyTexture = rawLoader.LoadTextureRAW("skyboxtexture.raw", 0, 4096, 3072);
-	//skyTextureTop = rawLoader.LoadTextureRAW("skytexturetop.raw", 0, 512);
-	//skyTextureBottom = rawLoader.LoadTextureRAW("skytexturebottom.raw", 0, 512);
 
 	// load the skybox to a display list
 	displayList = glGenLists(1);
@@ -32,8 +29,11 @@ void SkyBox::Init(void) {
 
 	glPushMatrix();
 
-	GLfloat emissiveMaterial[] = {1.0f, 1.0f, 1.0f};
-	GLfloat nonEmissiveMaterial[] = {0.0f, 0.0f, 0.0f};
+	GLfloat skycolour[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+	GLfloat emissiveMaterial[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+	GLfloat nonEmissiveMaterial[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, skycolour); // material colour
 
 	// Turn on Emissive lighting. We don't want shadows or dark patches on the skybox
 	glMaterialfv(GL_FRONT, GL_EMISSION, emissiveMaterial);
@@ -46,85 +46,71 @@ void SkyBox::Init(void) {
 	glScalef(512.0f, 512.0f, 512.0f);
 	glTranslatef(1.0f, 0.6f, 1.0f);
 
-	//glRotatef(90, 0, 1, 0);
+	GLfloat half = 0.5f;
 
 	//walls
-
 	glPushMatrix();
 	glBegin (GL_QUADS);
-		glNormal3f(0.0f, 0.0f, -1.0f); 
-		glTexCoord2f(0, 0.6666f); glVertex3f(-1.0, -0.5f, 1.0);
-		glTexCoord2f(0, 0.3333f); glVertex3f(-1.0, 0.5f, 1.0);
-		glTexCoord2f(0.25f, 0.3333f); glVertex3f(1.0, 0.5f, 1.0);
-		glTexCoord2f(0.25f, 0.6666f); glVertex3f(1.0, -0.5f, 1.0);
+	glNormal3f(0.0f, 0.0f, -1.0f);
+	glTexCoord2f(0.001f, 0.665f); glVertex3f(-1.0, -half, 1.0);
+	glTexCoord2f(0.001f, 0.334f); glVertex3f(-1.0, half, 1.0);
+	glTexCoord2f(0.249f, 0.334f); glVertex3f(1.0, half, 1.0);
+	glTexCoord2f(0.249f, 0.665f); glVertex3f(1.0, -half, 1.0);
 	glEnd();
-
 	glPopMatrix();
 
 	glRotatef(90, 0, 1, 0);
 	glPushMatrix();
-		glBegin (GL_QUADS);
-			glNormal3f(0.0f, 0.0f, -1.0f); 
-			glTexCoord2f(0.25f, 0.6666f); glVertex3f(-1.0, -0.5f, 1.0);
-			glTexCoord2f(0.25f, 0.3333f); glVertex3f(-1.0, 0.5f, 1.0);
-			glTexCoord2f(0.5f, 0.3333f); glVertex3f(1.0, 0.5f, 1.0);
-			glTexCoord2f(0.5f, 0.6666f); glVertex3f(1.0, -0.5f, 1.0);
-		glEnd();
-
+	glBegin (GL_QUADS);
+	glNormal3f(0.0f, 0.0f, -1.0f); 
+	glTexCoord2f(0.251f, 0.665f); glVertex3f(-1.0, -half, 1.0);
+	glTexCoord2f(0.251f, 0.334f); glVertex3f(-1.0, half, 1.0);
+	glTexCoord2f(0.499f, 0.334f); glVertex3f(1.0, half, 1.0);
+	glTexCoord2f(0.499f, 0.665f); glVertex3f(1.0, -half, 1.0);
+	glEnd();
 	glPopMatrix();
 
 	glRotatef(90, 0, 1, 0);
 	glPushMatrix();
-		glBegin (GL_QUADS);
-			glNormal3f(0.0f, 0.0f, -1.0f); 
-			glTexCoord2f(0.5f, 0.6666f); glVertex3f(-1.0, -0.5f, 1.0);
-			glTexCoord2f(0.5f, 0.3333f); glVertex3f(-1.0, 0.5f, 1.0);
-			glTexCoord2f(0.75f, 0.3333f); glVertex3f(1.0, 0.5f, 1.0);
-			glTexCoord2f(0.75f, 0.6666f); glVertex3f(1.0, -0.5f, 1.0);
-		glEnd();
-
+	glBegin (GL_QUADS);
+	glNormal3f(0.0f, 0.0f, -1.0f); 
+	glTexCoord2f(0.501f, 0.665f); glVertex3f(-1.0, -half, 1.0);
+	glTexCoord2f(0.501f, 0.334f); glVertex3f(-1.0, half, 1.0);
+	glTexCoord2f(0.749f, 0.334f); glVertex3f(1.0, half, 1.0);
+	glTexCoord2f(0.749f, 0.665f); glVertex3f(1.0, -half, 1.0);
+	glEnd();
 	glPopMatrix();
 
 	glRotatef(90, 0, 1, 0);
 	glPushMatrix();
-		glBegin (GL_QUADS);
-			glNormal3f(0.0f, 0.0f, -1.0f); 
-			glTexCoord2f(0.75f, 0.6666f); glVertex3f(-1.0, -0.5f, 1.0);
-			glTexCoord2f(0.75f, 0.3333f); glVertex3f(-1.0, 0.5f, 1.0);
-			glTexCoord2f(1.0f, 0.3333f); glVertex3f(1.0, 0.5f, 1.0);
-			glTexCoord2f(1.0f, 0.6666f); glVertex3f(1.0, -0.5f, 1.0);
-		glEnd();
-
+	glBegin (GL_QUADS);
+	glNormal3f(0.0f, 0.0f, -1.0f); 
+	glTexCoord2f(0.751f, 0.665f); glVertex3f(-1.0, -half, 1.0);
+	glTexCoord2f(0.751f, 0.334f); glVertex3f(-1.0, half, 1.0);
+	glTexCoord2f(0.999f, 0.334f); glVertex3f(1.0, half, 1.0);
+	glTexCoord2f(0.999f, 0.665f); glVertex3f(1.0, -half, 1.0);
+	glEnd();
 	glPopMatrix();
 
+	// Top
 	glRotatef(180.0f, 0, 1, 0);
-
-	// Ceiling
-	//glBindTexture( GL_TEXTURE_2D, skyTextureTop);
-	///glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
 	glBegin (GL_QUADS);
-		glNormal3f(0, -1, 0);
-		glTexCoord2f(0.25f, 0.0); glVertex3f(-1.0f, 0.46f, -1.0f);
-		glTexCoord2f(0.5f, 0.0); glVertex3f(1.0f, 0.46f, -1.0f);
-		glTexCoord2f(0.5f, 0.3333f); glVertex3f(1.0f, 0.46f, 1.0f);
-		glTexCoord2f(0.25f, 0.3333f); glVertex3f(-1.0f, 0.46f, 1.0f);
+	glNormal3f(0, -1, 0);
+	glTexCoord2f(0.251f, 0.001f); glVertex3f(-1.0f, half, -1.0f);
+	glTexCoord2f(0.499f, 0.001f); glVertex3f(1.0f, half, -1.0f);
+	glTexCoord2f(0.499f, 0.332f); glVertex3f(1.0f, half, 1.0f);
+	glTexCoord2f(0.251f, 0.332f); glVertex3f(-1.0f, half, 1.0f);
 	glEnd();
 
 
-	// Floor
-	//glBindTexture( GL_TEXTURE_2D, skyTextureBottom);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glBegin (GL_QUADS);
-		glNormal3f(0, 1, 0);
-		glTexCoord2f(0.25f, 0.6666f); glVertex3f(-1.0f, -0.5f, -1.0f);
-		glTexCoord2f(0.5f, 0.6666f); glVertex3f(-1.0f, -0.5f,  1.0f);
-		glTexCoord2f(0.5f, 1.0f); glVertex3f(1.0f, -0.5f,  1.0f);
-		glTexCoord2f(0.25f, 1.0f); glVertex3f(1.0f, -0.5f, -1.0f);
-	glEnd();
+	// Bottom
+	//glBegin (GL_QUADS);
+	//	glNormal3f(0, 1, 0);
+	//	glTexCoord2f(0.25f, 0.6666f); glVertex3f(-1.0f, -0.5f, -1.0f);
+	//	glTexCoord2f(0.5f, 0.6666f); glVertex3f(-1.0f, -0.5f,  1.0f);
+	//	glTexCoord2f(0.5f, 1.0f); glVertex3f(1.0f, -0.5f,  1.0f);
+	//	glTexCoord2f(0.25f, 1.0f); glVertex3f(1.0f, -0.5f, -1.0f);
+	//glEnd();
 
 	glDisable(GL_TEXTURE_2D);
 

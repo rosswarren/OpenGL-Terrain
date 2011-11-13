@@ -1,12 +1,10 @@
 #pragma once
 
-#include "heightfield.h"
+#include "Terrain.h"
 
 class SkyBox {
 private:
 	GLuint skyTexture;
-	GLuint skyTextureTop;
-	GLuint skyTextureBottom;
 	GLuint displayList;
 public:
 	SkyBox(void); //constructor

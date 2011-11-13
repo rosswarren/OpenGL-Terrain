@@ -2,13 +2,11 @@
 #include "Refinery.h"
 
 
-Refinery::Refinery(void)
-{
+Refinery::Refinery(void) {
 }
 
 
-Refinery::~Refinery(void)
-{
+Refinery::~Refinery(void) {
 }
 
 /**
@@ -18,6 +16,8 @@ void Refinery::Init(void) {
 	//load textures
 	RawLoader rawLoader;
 	Shapes shapes;
+
+	rustTexture = rawLoader.LoadTextureRAW("rusttexture.raw", 1, 600, 600);
 
 	angle = 0;
 
@@ -33,18 +33,6 @@ void Refinery::Init(void) {
 
 	quadric = gluNewQuadric();
 	gluQuadricNormals(quadric, GL_TRUE);
-
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, pos);
-
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_DEPTH_TEST);
-
-	glEnable(GL_NORMALIZE);
 
 	/* white plastic gear */
 	smallgear = glGenLists(1);
@@ -191,22 +179,35 @@ void Refinery::Display(void) {
 
 	glPushMatrix();
 
+	glEnable(GL_TEXTURE_2D); // enable drawing the texture
+	glBindTexture(GL_TEXTURE_2D, rustTexture); // bind the texture
+
 	glTranslatef(440.0f, 200.0f, 550.0f);
 
 	GLfloat refinerycolour[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, refinerycolour); // material colour
 
 	glPushMatrix();
-	glTranslatef(0.0f, 17.0f, 15.0f);
-	glRotatef(angle, 0.0f, 0.0f, 1.0f);
-	shapes.cylinder(185.0f, 1.6, 1.6, 16, 1, quadric);
+	glTranslatef(0.0f, 17.0f, 5.0f);
+	glRotatef((GLfloat)angle, 0.0f, 0.0f, 1.0f);
+	shapes.cylinder(190.0f, 1.6, 1.6, 16, 1, quadric);
 	glPopMatrix();
 
-	
+	glPushMatrix();
+	glTranslatef(0.0f, -50.0f, 6.0f);
+	shapes.cuboid(8.0f, 180.0f, 8.0f);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.0f, 17.0f, 192.0f);
+	shapes.cuboid(12.0f, 14.0f, 18.0f);
+	glPopMatrix();
 
 	for (int i = 0; i < 5; i++) {
 		glTranslatef(0, 0, 25.0f);
 		glPushMatrix();
+		
+
 		// white plastic gears and whisks
 		glPushMatrix();
 		glTranslatef(0.0f, 0.0f, -5.0f);
@@ -241,7 +242,10 @@ void Refinery::Display(void) {
 		// top joining struts
 		glPushMatrix();
 		glTranslatef(0.0f, 35.0f, 0.0f);
+		
+		
 		glCallList(topstrut);
+		
 		glPopMatrix();
 
 		// angled top struts
@@ -266,6 +270,8 @@ void Refinery::Display(void) {
 		glPopMatrix();
 
 	}
+
+	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 }

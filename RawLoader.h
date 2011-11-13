@@ -1,13 +1,12 @@
 #pragma once
 
-#include "heightfield.h"
+#include "Terrain.h"
 
-class RawLoader
-{
+class RawLoader {
 public:
 	RawLoader(void);
 	~RawLoader(void);
 
-	GLuint LoadTextureRAW(const char * filename, int wrap, int width, int height);
+	GLuint LoadTextureRAW(char * filename, int wrap, int width, int height);
 };
 
