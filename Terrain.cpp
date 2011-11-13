@@ -5,11 +5,17 @@
 
 static GLuint textureNumber;
 
+/**
+* Terrain code is adapted from
+*
+*
+*/
 Terrain::Terrain() {
 	hLOD = 32;
 	loaded = false;
 }
 
+// initialise terrain from heightmap and load texture
 void Terrain::Init() {
 	int height = 1024;
 	int width = 1024;
@@ -81,6 +87,7 @@ void Terrain::Init() {
 	vhNormals = NULL;
 }
 
+/** gets a Y coordinate value from the heightmap based on its X and Y */
 float Terrain::GetHeightAt(unsigned int x, unsigned int z) {
 	float y = hHeightField[x][z];
 	y *= 1.2f;
@@ -89,10 +96,12 @@ float Terrain::GetHeightAt(unsigned int x, unsigned int z) {
 	return y;
 }
 
+/** returns the terrain complexity */
 GLuint Terrain::GetComplexity() {
 	return hLOD;
 }
 
+/** increases the terrain complexity */
 void Terrain::IncreaseComplexity() {
 	hLOD /= 2;
 
@@ -104,6 +113,7 @@ void Terrain::IncreaseComplexity() {
 	Init();
 }
 
+/** decreases the terrain complexity */
 void Terrain::DecreaseComplexity() {
 	hLOD *= 2;
 
@@ -115,6 +125,7 @@ void Terrain::DecreaseComplexity() {
 	Init();
 }
 
+/** displays the terrain */
 void Terrain::Display() {
 	GLfloat terraincolour[4] = {0.7f, 0.7f, 0.7f, 1.0f};
 

@@ -4,7 +4,6 @@
 
 Trees::Trees(void) {
 	treeLvl = 4;
-	leaves = false;
 	loaded = false;
 }
 
@@ -12,6 +11,7 @@ Trees::Trees(void) {
 Trees::~Trees(void) {
 }
 
+// decrease tree complexity
 void Trees::DecreaseComplexity(void) {
 	for (unsigned int i = 0; i < numTrees; i++) {
 		glDeleteLists(treeLists[i], 1);
@@ -22,6 +22,7 @@ void Trees::DecreaseComplexity(void) {
 	Init();
 }
 
+// increase tree complexity
 void Trees::IncreaseComplexity(void) {
 	for (unsigned int i = 0; i < numTrees; i++) {
 		glDeleteLists(treeLists[i], 1);
@@ -32,6 +33,8 @@ void Trees::IncreaseComplexity(void) {
 	Init();
 }
 
+
+// regenerate trees
 void Trees::Regen(void) {
 	for (unsigned int i = 0; i < numTrees; i++) {
 		glDeleteLists(treeLists[i], 1);
@@ -40,10 +43,12 @@ void Trees::Regen(void) {
 	Init();
 }
 
+// return tree complexity
 int Trees::GetComplexity(void) {
 	return treeLvl;
 }
 
+// setup the locations of trees
 void Trees::SetUpHeights(Terrain &terrain, float lavaHeight) {
 	srand(rand());
 	
@@ -52,6 +57,7 @@ void Trees::SetUpHeights(Terrain &terrain, float lavaHeight) {
 	}
 }
 
+// set up tree location
 void Trees::SetUpHeight(int i, Terrain &terrain, float lavaHeight) {
 	float x = (float)random(1, 1024);
 	float z = (float)random(1, 1024);
@@ -136,7 +142,7 @@ void Trees::tree(int level)  {
 	}
 }
 
-
+// return a random number in a range
 int Trees::random(int min, int max) {
 	int randNum = (rand() % max) + min;
 

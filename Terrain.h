@@ -38,22 +38,24 @@ private:
 	unsigned int hmWidth;
 	unsigned int terrainList;
 	unsigned int tID[2];
+	unsigned int vhVBOVertices;
+	unsigned int vhVBOTexCoords;
+	unsigned int vhVBONormals;
 
 	int vhVertexCount;
 	Vert *vhVertices;
 	TexCoord *vhTexCoords;
 	Normal *vhNormals;
 
-	unsigned int vhVBOVertices;
-	unsigned int vhVBOTexCoords;
-	unsigned int vhVBONormals;
+	
 	bool loaded;
 	GLuint hLOD;
+
+	GLubyte hHeightField[1024][1024];
+	GLubyte texture[1024][1024];
 public:
 	void Display();
 	void Init();
-	GLubyte hHeightField[1024][1024];
-	GLubyte texture[1024][1024];
 	Terrain(void);
 	void DrawDots(void);
 	void IncreaseComplexity(void);

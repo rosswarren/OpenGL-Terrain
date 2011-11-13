@@ -6,15 +6,14 @@
 #endif
 
 
-Shapes::Shapes(void)
-{
+Shapes::Shapes(void) {
 }
 
 
-Shapes::~Shapes(void)
-{
+Shapes::~Shapes(void) {
 }
 
+// draw a cube with normals and texture coordinates
 void Shapes::cube(void) {
 	glBegin(GL_QUADS);
     // Front Face
@@ -58,6 +57,7 @@ void Shapes::cube(void) {
 	glEnd();
 }
 
+// draws a cuboid, which is just a cube scaled
 void Shapes::cuboid(GLfloat width, GLfloat height, GLfloat depth) {
 	glPushMatrix();
 	glScalef(width / 2 , height / 2, depth / 2);
@@ -65,7 +65,9 @@ void Shapes::cuboid(GLfloat width, GLfloat height, GLfloat depth) {
 	glPopMatrix();
 }
 
-/** draw a gear */
+/** draw a gear 
+* Adapted from here http://www.opengl.org/resources/code/samples/glut_examples/mesademos/mesademos.html
+*/
 void Shapes::gear(GLfloat innerRadius, GLfloat outerRadius, GLfloat width, GLint teeth, GLfloat tooth_depth) {
 	GLint i; //general purpose incrementer for loops
 	GLfloat r0, r1, r2, u, v, len, da;
@@ -212,6 +214,7 @@ void Shapes::cylinder(double height, double radiusBase, double radiusTop, int sl
 	glPopMatrix();
 }
 
+/** draw whisk with spindle, part of the refinery */
 void Shapes::drawWhisk(int direction, double angle, int smallgear, int whisk, GLUquadricObj* quadric) {
 	GLdouble whiskangle = direction == 0 ? angle : -angle; // reverse the angle if direction is 0
 

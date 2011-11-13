@@ -19,14 +19,15 @@
 
 float xpos = 512.0f, ypos = 512.0f, zpos = 512.0f, xrot = 758.0f, yrot = 238.0f, angle = 0.0f;
 float lastx, lasty;
-float bounce;
-float cScale = 1.0;
+
+// for fps
 int time;
 int frame = 0;
 int timebase = 0;
-int fps = 0;
-bool wireframe = false;
-bool refinerydisplay = false;
+int fps = 0; 
+
+bool wireframe = false; // show wireframe?
+bool refinerydisplay = false; // display the refinery?
 
 SkyBox skyBox;
 Lava lava;
@@ -44,7 +45,7 @@ void camera (void) {
 
 	if (xrot < -90) xrot = -90;
 
-	ypos = lava.height + 65.0f; // fix to the height of boating on lava viewpoint
+	ypos = lava.getHeight() + 65.0f; // fix to the height of boating on lava viewpoint
 
 	// rotate to the rotation variables
 	glRotatef(xrot, 1.0f, 0.0f, 0.0f);
@@ -99,7 +100,7 @@ void drawText(void) {
 	strings[0] = "Ross Warren's OpenGL Assignement";
 	strings[1] = "Controls:";
 	strings[2] = "Movement: WASD, Decrease tree complexity: Z, Increase tree complexity: X, Recalculate trees: C, Relocate trees: T, Raise lava: E, Lower lava: F";
-	strings[3] = "Increase terrain complexity: M, Decrease terrain complexity: N, Toggle wireframe: V";
+	strings[3] = "Decrease terrain complexity: N, Increase terrain complexity: M, Toggle wireframe: V";
 	
 	float complexity = (float)terrain.GetComplexity();
 	complexity = complexity / 32.0f * 100.0f;
@@ -125,6 +126,7 @@ void drawText(void) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
+/** opengl display method, draws everything */
 void display (void) {
 	glClearColor(0.0, 0.0, 0.0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -160,6 +162,7 @@ void display (void) {
 	glutSwapBuffers();
 }
 
+/** Initialise OpenGL extensions for vertex buffer objects */
 void initExtensions(void){
 	glGenBuffersARB = (PFNGLGENBUFFERSARBPROC) wglGetProcAddress("glGenBuffersARB");
 	glBindBufferARB = (PFNGLBINDBUFFERARBPROC) wglGetProcAddress("glBindBufferARB");
@@ -167,6 +170,7 @@ void initExtensions(void){
 	glDeleteBuffersARB = (PFNGLDELETEBUFFERSARBPROC) wglGetProcAddress("glDeleteBuffersARB");
 }
 
+/** Initialisation method. Sets up OpenGL and calls initialisations of all the components */
 void Init(void) {
 	initExtensions();
 	GLfloat pos[3] = {1024.0f, 800.0f, 0.0f};
@@ -198,11 +202,12 @@ void Init(void) {
 	lava.Init();
 	building.Init();
 	refinery.Init();
-	trees.SetUpHeights(terrain, lava.height);
+	trees.SetUpHeights(terrain, lava.getHeight());
 	trees.Init();
 	printf("Welcome to Ross's OpenGL Assigment \n");
 }
 
+/** mouse movement to look around */
 void mouseMovement(int x, int y) {
 	float diffx = x-lastx; 
 	float diffy = y-lasty; 
@@ -212,77 +217,94 @@ void mouseMovement(int x, int y) {
 	yrot += diffx;
 }
 
+/** toggle wireframe mode */
 void switchWireframe() {
 	glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_FILL : GL_LINE);
 	wireframe = !wireframe;
 }
 
+/** keyboard controlled */
 void keyboard(unsigned char key, int x, int y) {
 	float xrotrad, yrotrad;
 
 	switch(key) {
+	// move forwards
 	case 'w':
 		yrotrad = (yrot / 180.0f * M_PI);
 		xrotrad = (xrot / 180.0f * M_PI); 
-		xpos += float(sin(yrotrad)) * cScale;
-		zpos -= float(cos(yrotrad)) * cScale;
-		ypos -= float(sin(xrotrad)) ;
-		bounce += 0.04f;
+		xpos += sin(yrotrad);
+		zpos -= cos(yrotrad);
+		ypos -= sin(xrotrad);
 		break;
+	// strafe left
 	case 'a':
 		yrotrad = (yrot / 180.0f * M_PI);
-		xpos -= float(cos(yrotrad)) * cScale;
-		zpos -= float(sin(yrotrad)) * cScale;
+		xpos -= cos(yrotrad);
+		zpos -= sin(yrotrad);
 		break;
+	// move backwards
 	case 's':
 		yrotrad = (yrot / 180.0f * M_PI);
 		xrotrad = (xrot / 180.0f * M_PI); 
-		xpos -= float(sin(yrotrad)) * cScale;
-		zpos += float(cos(yrotrad)) * cScale;
-		ypos += float(sin(xrotrad));
-		bounce += 0.04f;
+		xpos -= sin(yrotrad);
+		zpos += cos(yrotrad);
+		ypos += sin(xrotrad);
 		break;
+	// move right
 	case 'd':
 		yrotrad = (yrot / 180.0f * M_PI);
-		xpos += float(cos(yrotrad)) * cScale;
-		zpos += float(sin(yrotrad)) * cScale;
+		xpos += cos(yrotrad);
+		zpos += sin(yrotrad);
 		break;
+	// increase lava height
 	case 'e':
-		lava.height += 1.0f;
+		lava.increaseHeight();
 		break;
+	// decrease lava height
 	case 'f':
-		lava.height -= 1.0f;
+		lava.decreaseHeight();
 		break;
+	// decrease tree complexity
 	case 'z':
 		printf("Decreasing tree complexity \n");
 		trees.DecreaseComplexity();
 		break;
+	// increase tree complexity
 	case 'x':
 		printf("Increasing tree complexity \n");
 		trees.IncreaseComplexity();
 		break;
+	// regenerate trees
 	case 'c':
 		printf("Regenerating trees \n");
 		trees.Regen();
 		break;
+	// decrease terrain complexity
 	case 'n':
+		printf("Decreasing terrain complexity \n");
 		terrain.DecreaseComplexity();
 		break;
+	// increase terrain complexity
 	case 'm':
+		printf("Increasing terrain complexity \n");
 		terrain.IncreaseComplexity();
 		break;
+	// toggle wireframe mode
 	case 'v':
 		switchWireframe();
 		break;
+	// toggle displaying of refinery
 	case 'r':
 		refinerydisplay = !refinerydisplay;
 		break;
+	// set up tree heights
 	case 't':
-		trees.SetUpHeights(terrain, lava.height);
+		trees.SetUpHeights(terrain, lava.getHeight());
 		break;
 	}
 }
 
+/** reshape called when the window is resized */
 void reshape(int w, int h) {
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 	glMatrixMode(GL_PROJECTION);
@@ -294,13 +316,13 @@ void reshape(int w, int h) {
 int main (int argc, char **argv) {
     glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA | GLUT_MULTISAMPLE);
-	glutInitWindowSize(500, 500);
-	glutInitWindowPosition(100, 100);
+	glutInitWindowSize(800, 640);
+	glutInitWindowPosition(400, 100);
 	puts("Show the refinery? This will not run on slower computers. (Y or N).");
 	char answer;
 	std::cin >> answer;
-	refinerydisplay = (answer == 'y') ? true : false; 
-    glutCreateWindow("Ross Warren's OpenGL Assignment");
+	refinerydisplay = (answer == 'y') ? true : false;
+	glutCreateWindow("Ross Warren's OpenGL Assignment");
 	Init();
     glutDisplayFunc(display);
 	glutIdleFunc(display);

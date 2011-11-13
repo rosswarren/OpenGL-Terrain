@@ -10,10 +10,7 @@ Lava::Lava(void) {
 Lava::~Lava(void) {
 }
 
-
-/**
-* Initialise by loading textures etc.
-*/
+// Initialise by loading textures etc.
 void Lava::Init(void) {
 	//load textures
 	RawLoader rawLoader;
@@ -43,6 +40,7 @@ void Lava::Init(void) {
 	glEndList();
 }
 
+// display the lava
 void Lava::Display(void) {
 	glDepthMask(GL_FALSE);
 	glPushMatrix();
@@ -50,4 +48,19 @@ void Lava::Display(void) {
 	glCallList(displayList);
 	glPopMatrix();
 	glDepthMask(GL_TRUE);
+}
+
+/** return the lava height */
+GLfloat Lava::getHeight(void) {
+	return height;
+}
+
+/** increase the lava height */
+void Lava::increaseHeight(void) {
+	height += 1.0f;
+}
+
+/** decrease the lava height */
+void Lava::decreaseHeight(void) {
+	height -= 1.0f;
 }

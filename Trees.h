@@ -5,16 +5,15 @@
 
 const int numTrees = 10;
 
-class Trees
-{
+class Trees {
 private:
 	GLUquadricObj* quadric;
 	GLuint woodTexture;
 	GLuint treeLists[numTrees];
 	Vert randomHeights[numTrees];
 	int treeLvl;
-	bool leaves;
 	bool loaded;
+
 	void tree(int level);
 	int random(int min, int max);
 public:
@@ -30,4 +29,3 @@ public:
 	void SetUpHeights(Terrain &terrain, float lavaHeight);
 	void SetUpHeight(int i, Terrain &terrain, float lavaHeight);
 };
-

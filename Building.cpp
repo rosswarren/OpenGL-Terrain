@@ -31,8 +31,8 @@ void Building::Init(void) {
 }
 
 void Building::Display(void) {
-	//glPushMatrix();
+	glPushMatrix();
 	glBindTexture(GL_TEXTURE_2D, texture); // bind the texture
 	glCallList(displayList);
-	//glPopMatrix();
+	glPopMatrix();
 }

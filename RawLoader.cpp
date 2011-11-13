@@ -2,15 +2,14 @@
 #include "RawLoader.h"
 
 
-RawLoader::RawLoader(void)
-{
+RawLoader::RawLoader(void) {
 }
 
 
-RawLoader::~RawLoader(void)
-{
+RawLoader::~RawLoader(void) {
 }
 
+// load a texture and return its OpengGL mapped integer
 GLuint RawLoader::LoadTextureRAW(char * filename, int wrap, int width, int height) {
     GLuint texture;
     GLubyte * data;
@@ -63,11 +62,7 @@ GLuint RawLoader::LoadTextureRAW(char * filename, int wrap, int width, int heigh
     // free buffer
     free(data);
 
-	std::stringstream ss;
-	std::string str;
-	ss << filename << " loaded \n";
-	str = ss.str();
-	std::cout << str;
+	std::cout << filename << " loaded \n";
 
     return texture;
 }
