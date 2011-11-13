@@ -3,12 +3,15 @@
 #include "Terrain.h"
 #include <math.h>
 
+const int numTrees = 10;
+
 class Trees
 {
 private:
 	GLUquadricObj* quadric;
 	GLuint woodTexture;
-	GLuint treeLists[5];
+	GLuint treeLists[numTrees];
+	Vert randomHeights[numTrees];
 	int treeLvl;
 	bool leaves;
 	bool loaded;
@@ -24,5 +27,7 @@ public:
 	void DecreaseComplexity(void);
 	void Regen(void);
 	int GetComplexity(void);
+	void SetUpHeights(Terrain &terrain, float lavaHeight);
+	void SetUpHeight(int i, Terrain &terrain, float lavaHeight);
 };
 

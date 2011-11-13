@@ -58,5 +58,6 @@ public:
 	void DrawDots(void);
 	void IncreaseComplexity(void);
 	void DecreaseComplexity(void);
+	float GetHeightAt(unsigned int x, unsigned int z);
 	GLuint GetComplexity(void);
 };

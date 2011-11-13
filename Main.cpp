@@ -15,7 +15,7 @@
 #define M_PI 3.14159265f
 #endif
 
-#pragma comment(lib,"glew32.lib")
+#pragma comment(lib, "glew32.lib")
 
 float xpos = 512.0f, ypos = 512.0f, zpos = 512.0f, xrot = 758.0f, yrot = 238.0f, angle = 0.0f;
 float lastx, lasty;
@@ -35,6 +35,7 @@ Refinery refinery;
 Trees trees;
 Terrain terrain;
 
+/** Setup the camera viewpoint */
 void camera (void) {
 	int posX = (int)xpos;
 	int posZ = (int)zpos;
@@ -43,13 +44,17 @@ void camera (void) {
 
 	if (xrot < -90) xrot = -90;
 
-	ypos = lava.height + 65.0f;
+	ypos = lava.height + 65.0f; // fix to the height of boating on lava viewpoint
 
+	// rotate to the rotation variables
 	glRotatef(xrot, 1.0f, 0.0f, 0.0f);
-	glRotatef(yrot, 0.0f, 1.0f, 0.0f); 
+	glRotatef(yrot, 0.0f, 1.0f, 0.0f);
+
+	// translate to the position variables
 	glTranslated(-xpos, -ypos, -zpos);
 }
 
+/** setup the fog */
 void fog(void) {
 	GLfloat fogColor[] = {0.5f, 0.5f, 0.5f, 1};
 	glFogfv(GL_FOG_COLOR, fogColor);
@@ -58,17 +63,19 @@ void fog(void) {
     glFogf(GL_FOG_END, 850.0f);
 }
 
+/** calculate the fps */
 void calcFPS() {
-	frame++;
-	time=glutGet(GLUT_ELAPSED_TIME);
+	frame++; // increment the frame count since the last check
+	time = glutGet(GLUT_ELAPSED_TIME); 
 
-	if (time - timebase > 1000) {
-		fps = (int)(frame * 1000.0 / (time-timebase));
+	if (time - timebase > 200) { // check every 1/5th of a second
+		fps = (int)(frame * 1000 / (time-timebase)); // set the calculated FPS
 	 	timebase = time;
 		frame = 0;
 	}
 }
 
+/** draw a string to the screen */
 void drawString(std::string s) {
 	void * font = GLUT_BITMAP_9_BY_15;
 	for (std::string::iterator i = s.begin(); i != s.end(); ++i) {
@@ -77,6 +84,7 @@ void drawString(std::string s) {
 	}
 }
 
+/** draw the controls and informational text */
 void drawText(void) {
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -88,34 +96,18 @@ void drawText(void) {
 	glLoadIdentity();
 
 	std::string strings [5];
-
 	strings[0] = "Ross Warren's OpenGL Assignement";
 	strings[1] = "Controls:";
-	strings[2] = "Movement: WASD, Decrease tree complexity: Z, Increase tree complexity: X, Recalculate Trees: C, Raise lava: E, Lower lava: F";
+	strings[2] = "Movement: WASD, Decrease tree complexity: Z, Increase tree complexity: X, Recalculate trees: C, Relocate trees: T, Raise lava: E, Lower lava: F";
 	strings[3] = "Increase terrain complexity: M, Decrease terrain complexity: N, Toggle wireframe: V";
 	
-	std::string s = "Tree complexity: ";
+	float complexity = (float)terrain.GetComplexity();
+	complexity = complexity / 32.0f * 100.0f;
+	complexity = 1 / complexity * 625.0f;
 
 	std::stringstream ss;
-	
-	ss << s << trees.GetComplexity();
-
-	s = " Frames per second: ";
-	
-	ss << s << fps;
-
-	s = " Terrain complexity: ";
-
-	float complexity = (float)terrain.GetComplexity();
-
-	complexity = complexity / 32 * 100;
-
-	complexity = 1 / complexity * 625;
-	
-	ss << s << complexity << "%";
-
+	ss << "Tree complexity: " << trees.GetComplexity() << ", Frames per second: " << fps << ", Terrain complexity: " <<  complexity << "%";
 	strings[4] = ss.str();
-
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 	int height = 60;
@@ -154,14 +146,16 @@ void display (void) {
 
 	if (refinerydisplay) refinery.Display();
 
-	trees.Display();
 	terrain.Display();
+	trees.Display();
 	lava.Display();
 	//terrain.DrawDots();
 
 	glPopMatrix();
 
+	glDisable(GL_LIGHTING);
 	drawText(); // draw the help and informational text
+	glEnable(GL_LIGHTING);
 
 	glutSwapBuffers();
 }
@@ -194,7 +188,7 @@ void Init(void) {
 	glEnable(GL_BLEND); //Enable alpha blending
 	glEnable(GL_TEXTURE_2D);
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Set the blend function
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Set the blend function
 
 	glShadeModel(GL_SMOOTH);
 
@@ -204,6 +198,7 @@ void Init(void) {
 	lava.Init();
 	building.Init();
 	refinery.Init();
+	trees.SetUpHeights(terrain, lava.height);
 	trees.Init();
 	printf("Welcome to Ross's OpenGL Assigment \n");
 }
@@ -282,6 +277,9 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'r':
 		refinerydisplay = !refinerydisplay;
 		break;
+	case 't':
+		trees.SetUpHeights(terrain, lava.height);
+		break;
 	}
 }
 
@@ -298,6 +296,10 @@ int main (int argc, char **argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowSize(500, 500);
 	glutInitWindowPosition(100, 100);
+	puts("Show the refinery? This will not run on slower computers. (Y or N).");
+	char answer;
+	std::cin >> answer;
+	refinerydisplay = (answer == 'y') ? true : false; 
     glutCreateWindow("Ross Warren's OpenGL Assignment");
 	Init();
     glutDisplayFunc(display);

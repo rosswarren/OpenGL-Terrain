@@ -13,7 +13,7 @@ Trees::~Trees(void) {
 }
 
 void Trees::DecreaseComplexity(void) {
-	for (unsigned int i = 0; i < 5; i++) {
+	for (unsigned int i = 0; i < numTrees; i++) {
 		glDeleteLists(treeLists[i], 1);
 	}
 
@@ -23,7 +23,7 @@ void Trees::DecreaseComplexity(void) {
 }
 
 void Trees::IncreaseComplexity(void) {
-	for (unsigned int i = 0; i < 5; i++) {
+	for (unsigned int i = 0; i < numTrees; i++) {
 		glDeleteLists(treeLists[i], 1);
 	}
 
@@ -33,7 +33,7 @@ void Trees::IncreaseComplexity(void) {
 }
 
 void Trees::Regen(void) {
-	for (unsigned int i = 0; i < 5; i++) {
+	for (unsigned int i = 0; i < numTrees; i++) {
 		glDeleteLists(treeLists[i], 1);
 	}
 	
@@ -44,10 +44,32 @@ int Trees::GetComplexity(void) {
 	return treeLvl;
 }
 
+void Trees::SetUpHeights(Terrain &terrain, float lavaHeight) {
+	srand(rand());
+	
+	for (int i = 0; i < numTrees; i++) {
+		SetUpHeight(i, terrain, lavaHeight);		
+	}
+}
+
+void Trees::SetUpHeight(int i, Terrain &terrain, float lavaHeight) {
+	float x = (float)random(1, 1024);
+	float z = (float)random(1, 1024);
+	float y = terrain.GetHeightAt((unsigned int)x, (unsigned int)z);
+
+	if (y < (lavaHeight + 50)) {
+		SetUpHeight(i, terrain, lavaHeight);
+	} else {
+		randomHeights[i].x = x;
+		randomHeights[i].y = y;
+		randomHeights[i].z = z;
+	}
+}
+
 /**
 * Initialise by loading textures etc.
 */
-void Trees::Init(void) {
+void Trees::Init() {
 	//load textures
 	RawLoader rawLoader;
 	Shapes shapes;
@@ -61,7 +83,9 @@ void Trees::Init(void) {
 		loaded = true;
 	}
 
-	for (unsigned int i = 0; i < 5; i++) {
+	srand(rand());
+
+	for (unsigned int i = 0; i < numTrees; i++) {
 		treeLists[i] = glGenLists(1);
 		glNewList(treeLists[i], GL_COMPILE);
 		glScalef(17.0f, 17.0f, 17.0f);
@@ -70,24 +94,22 @@ void Trees::Init(void) {
 	}
 }
 
-void Trees::Display(void) {
+void Trees::Display() {
+	glPushMatrix();
 	glBindTexture(GL_TEXTURE_2D, woodTexture); // bind the texture
 
-	glPushMatrix();
-	glTranslatef(440.0f, 203.0f, 450.0f);
-	glCallList(treeLists[0]);
-	glPopMatrix();
+	for (unsigned int i = 0; i < numTrees; i++) {
+		glPushMatrix();
+		glTranslatef(randomHeights[i].x, randomHeights[i].y, randomHeights[i].z);
+		glCallList(treeLists[i]);
+		glPopMatrix();
+	}
 
-	glPushMatrix();
-	glTranslatef(570.0f, 167.0f, 520.0f);
-	glCallList(treeLists[1]);
 	glPopMatrix();
 }
 
 // Draw the tree and leaves recursively
 void Trees::tree(int level)  {
-	srand(rand());
-
 	if (level == 0) {
 		glPushMatrix();
 		glRotatef(-90.0f, 1.0f, 0, 0);

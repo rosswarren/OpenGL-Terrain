@@ -170,8 +170,10 @@ void Refinery::Display(void) {
 		glPopMatrix();
 
 		// top joining struts
+		glPushMatrix();
 		glTranslatef(0.0f, 35.0f, 0.0f);
 		shapes.cuboid(5.0f, 1.0f, 12.0f);
+		glPopMatrix();
 	}
 
 	glPopMatrix();

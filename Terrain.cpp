@@ -51,7 +51,7 @@ void Terrain::Init() {
 				vhTexCoords[nIndex].u = flX / 1024;
 				vhTexCoords[nIndex].v = flZ / 1024;
 				vhNormals[nIndex].x = 0;
-				vhNormals[nIndex].y = 0;
+				vhNormals[nIndex].y = 1;
 				vhNormals[nIndex].z = 0;
 				nIndex++;
 			}
@@ -79,6 +79,14 @@ void Terrain::Init() {
 
 	delete [] vhNormals;
 	vhNormals = NULL;
+}
+
+float Terrain::GetHeightAt(unsigned int x, unsigned int z) {
+	float y = hHeightField[x][z];
+	y *= 1.2f;
+	y -= 30.0f;
+
+	return y;
 }
 
 GLuint Terrain::GetComplexity() {
@@ -109,15 +117,12 @@ void Terrain::DecreaseComplexity() {
 
 void Terrain::Display() {
 	GLfloat terraincolour[4] = {0.7f, 0.7f, 0.7f, 1.0f};
-	GLfloat specular[3] = {1.0f, 1.0f, 1.0f};
 
 	glPushMatrix();
 	glScalef(1.0f, 1.2f, 1.0f);
 	glTranslatef(0.0f, -20.0f, 0.0f);
 
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, terraincolour); // material colour
-	glMaterialfv(GL_FRONT, GL_SPECULAR, specular); // the specular light colour
-	glMateriali(GL_FRONT, GL_SHININESS, 120); // how shiney it is
 
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glBindTexture(GL_TEXTURE_2D, textureNumber); // bind the texture
@@ -129,8 +134,8 @@ void Terrain::Display() {
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBOVertices);
 	glVertexPointer(3, GL_FLOAT, 0, (char *) NULL);
 
-	//glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBONormals);
-	//glNormalPointer(GL_FLOAT, 0, (char *) NULL);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vhVBONormals);
+	glNormalPointer(GL_FLOAT, 0, (char *) NULL);
 
 	glNormal3f(0, 1.0f, 0);
 
