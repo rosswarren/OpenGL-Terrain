@@ -1,5 +1,8 @@
-#include "StdAfx.h"
 #include "Refinery.h"
+
+/**
+* Refinery adapted from my first whisk assignment. May be too much for an older PC to run so choose 'n' on startup if it crashes.
+*/
 
 
 Refinery::Refinery(void) {
@@ -33,51 +36,6 @@ void Refinery::Init(void) {
 
 	quadric = gluNewQuadric();
 	gluQuadricNormals(quadric, GL_TRUE);
-
-	/* white plastic gear
-	smallgear = glGenLists(1);
-	glNewList(smallgear, GL_COMPILE);
-	shapes.gear(1.0f, 4.0f, 5.0f, 12, 0.7f); // make gear inner radius, outer radius, width, number of teeth, teeth size
-	glEndList(); */
-
-	/* big metal gear 
-	biggear = glGenLists(1);
-	glNewList(biggear, GL_COMPILE);
-	shapes.gear(11.0f, 15.0f, 3.0f, 50.0f, 2.0f);
-	glEndList();*/
-
-	/* inner gear support */
-	//innergearsupport = glGenLists(1);
-	//glNewList(innergearsupport, GL_COMPILE);
-	/* inner gear supports */
-	//shapes.innergearsupports();
-	//glEndList();
-
-	/* strut
-	strut = glGenLists(1);
-	glNewList(strut, GL_COMPILE);
-	glColor3fv(whiskcolor);
-	shapes.cuboid(5.0f, 30.0f, 1.0f);
-	glEndList(); */
-
-	/* top strut
-	topstrut = glGenLists(1);
-	glNewList(topstrut, GL_COMPILE);
-	glTranslatef(0.0f, 35.0f, 0.0f);
-	shapes.cuboid(5.0f, 1.0f, 12.0f);
-	glEndList(); */
-
-	/* angled strut */
-//	angledstrut = glGenLists(1);
-//	glNewList(angledstrut, GL_COMPILE);
-//	shapes.cuboid(5.0f, 25.0f, 1.0f);
-//	glEndList();
-
-	/* handle */
-	///handle = glGenLists(1);
-	//glNewList(handle, GL_COMPILE);
-	//shapes.cuboid(10.0f, 10.0f, 38.0f);
-	//glEndList();
 
 	/* whisk */
 	whisk = glGenLists(1);

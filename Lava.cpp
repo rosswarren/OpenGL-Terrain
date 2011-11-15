@@ -1,6 +1,8 @@
-#include "StdAfx.h"
 #include "Lava.h"
 
+/**
+* Lava texture from deviantart
+*/
 
 Lava::Lava(void) {
 	height = 100.0f;
@@ -58,9 +60,13 @@ GLfloat Lava::getHeight(void) {
 /** increase the lava height */
 void Lava::increaseHeight(void) {
 	height += 1.0f;
+
+	if (height > 215.0f) height = 215.0f;
 }
 
 /** decrease the lava height */
 void Lava::decreaseHeight(void) {
 	height -= 1.0f;
+
+	if (height < 0.0f) height = 0.0f;
 }

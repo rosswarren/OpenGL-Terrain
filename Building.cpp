@@ -1,6 +1,4 @@
-#include "StdAfx.h"
 #include "Building.h"
-
 
 Building::Building(void) {
 }

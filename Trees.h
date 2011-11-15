@@ -11,7 +11,7 @@ private:
 	GLuint woodTexture;
 	GLuint treeLists[numTrees];
 	Vert randomHeights[numTrees];
-	int treeLvl;
+	int level;
 	bool loaded;
 
 	void tree(int level);

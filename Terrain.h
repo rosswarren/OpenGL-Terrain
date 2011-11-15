@@ -10,8 +10,6 @@
 #include "RawLoader.h"
 #include "Shapes.h"
 
-
-
 class Vert{
 	public:  
 		float x;
@@ -42,21 +40,22 @@ private:
 	unsigned int vhVBOTexCoords;
 	unsigned int vhVBONormals;
 
-	int vhVertexCount;
-	Vert *vhVertices;
-	TexCoord *vhTexCoords;
-	Normal *vhNormals;
-
-	
+	int vertexCount;
 	bool loaded;
-	GLuint hLOD;
 
+	GLuint complexity;
 	GLubyte hHeightField[1024][1024];
 	GLubyte texture[1024][1024];
+
+	Vert *vertices;
+	TexCoord *texCoords;
+	Normal *normals;
 public:
+	Terrain(void);
+
 	void Display();
 	void Init();
-	Terrain(void);
+	
 	void DrawDots(void);
 	void IncreaseComplexity(void);
 	void DecreaseComplexity(void);

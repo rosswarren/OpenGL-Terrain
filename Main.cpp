@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -10,6 +9,11 @@
 #include "Building.h"
 #include "Refinery.h"
 #include "Trees.h"
+
+/**
+* Alien Plant by Ross Warren
+* OpenGL Assignment 2
+*/
 
 #ifndef M_PI
 #define M_PI 3.14159265f
@@ -41,9 +45,20 @@ void camera (void) {
 	int posX = (int)xpos;
 	int posZ = (int)zpos;
 
+	// stop camera from flipping
 	if (xrot > 90) xrot = 90;
 
 	if (xrot < -90) xrot = -90;
+
+
+	// stop movement outside of skybox
+	if (zpos > 800) zpos = 800;
+
+	if (zpos < 200) zpos = 200;
+
+	if (xpos > 800) xpos = 800;
+
+	if (xpos < 200) xpos = 200;
 
 	ypos = lava.getHeight() + 65.0f; // fix to the height of boating on lava viewpoint
 
@@ -174,8 +189,6 @@ void initExtensions(void){
 void Init(void) {
 	initExtensions();
 	GLfloat pos[3] = {1024.0f, 800.0f, 0.0f};
-	GLfloat whiskcolor[3] = {0.74f, 0.74f, 0.74f};
-	//GLfloat specular[3] = {0.0f, 0.0f, 0.0f};
 	GLfloat ambient[3] = {0.1f, 0.1f, 0.1f};
 	GLfloat diffuse[3] = {0.8f, 0.8f, 0.8f};
 
@@ -291,14 +304,20 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	// toggle wireframe mode
 	case 'v':
+		if (!wireframe) printf("Enabling wireframe \n"); else printf("Disabling wireframe \n");
+
 		switchWireframe();
 		break;
 	// toggle displaying of refinery
 	case 'r':
+		if (!refinerydisplay) printf("Enabling refinery \n"); else printf("Disabling refinery \n");
+
 		refinerydisplay = !refinerydisplay;
 		break;
 	// set up tree heights
 	case 't':
+		printf("Moving trees \n");
+
 		trees.SetUpHeights(terrain, lava.getHeight());
 		break;
 	}

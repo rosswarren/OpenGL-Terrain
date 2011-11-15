@@ -1,9 +1,12 @@
-#include "StdAfx.h"
 #include "Trees.h"
+
+/**
+* Tree code heavily adapted from a misplaced online tutorial (sorry can't find it)
+*/
 
 
 Trees::Trees(void) {
-	treeLvl = 4;
+	level = 4;
 	loaded = false;
 }
 
@@ -17,7 +20,7 @@ void Trees::DecreaseComplexity(void) {
 		glDeleteLists(treeLists[i], 1);
 	}
 
-	if (treeLvl > 1) treeLvl--;
+	if (level > 1) level--;
 
 	Init();
 }
@@ -28,7 +31,7 @@ void Trees::IncreaseComplexity(void) {
 		glDeleteLists(treeLists[i], 1);
 	}
 
-	if (treeLvl < 8) treeLvl++;
+	if (level < 8) level++;
 
 	Init();
 }
@@ -45,7 +48,7 @@ void Trees::Regen(void) {
 
 // return tree complexity
 int Trees::GetComplexity(void) {
-	return treeLvl;
+	return level;
 }
 
 // setup the locations of trees
@@ -95,7 +98,7 @@ void Trees::Init() {
 		treeLists[i] = glGenLists(1);
 		glNewList(treeLists[i], GL_COMPILE);
 		glScalef(17.0f, 17.0f, 17.0f);
-		tree(treeLvl);
+		tree(level);
 		glEndList();
 	}
 }
@@ -114,18 +117,19 @@ void Trees::Display() {
 	glPopMatrix();
 }
 
-// Draw the tree and leaves recursively
-void Trees::tree(int level)  {
-	if (level == 0) {
+// Draw the tree recursively
+void Trees::tree(int stage)  {
+	if (stage == 0) {
 		glPushMatrix();
+		float length = random(70, 110); // randomise branch length
+		length /= 100.0f;
 		glRotatef(-90.0f, 1.0f, 0, 0);
-		gluCylinder(quadric, 0.102, 0.08, 1.025, 8, 1);
+		gluCylinder(quadric, 0.102, 0.08, length + 0.025f, 8, 1);
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
-		glTranslatef(0, 1.0f, 0);
+		glTranslatef(0, length, 0);
 	} else {
-		// trunk
-		tree(0);
+		tree(0); // first stage
 
 		for (int i = 0; i < 3; i++) {
 			glPushMatrix();
@@ -136,7 +140,7 @@ void Trees::tree(int level)  {
 			glRotatef(randAngle, 0.0, 1.0, 0.0);
 			randAngle = (float)random(25, 35);
 			glRotatef(-randAngle, 0.0, 0.0, 1.0);
-			tree(level - 1);
+			tree(stage - 1);
 			glPopMatrix();
 		}
 	}

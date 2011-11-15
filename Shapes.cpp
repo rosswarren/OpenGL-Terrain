@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "Shapes.h"
 
 #ifndef M_PI
